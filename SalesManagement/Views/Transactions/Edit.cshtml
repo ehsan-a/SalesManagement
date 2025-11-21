@@ -1,0 +1,324 @@
+﻿@using SalesManagement.Models.ViewModels
+@model Transaction
+
+@{
+    ViewData["Title"] = "Edit Transaction";
+    var products = ViewBag.Products as List<Product>;
+    var customers = ViewBag.Customers as List<Customer>;
+}
+
+<div class="container py-4">
+    <h2 class="fw-bold mb-4 text-dark">Edit Transaction</h2>
+
+    <form asp-action="Edit" method="post" class="shadow-sm p-4 rounded-4 bg-white" onsubmit="return validateForm()">
+        <input type="hidden" asp-for="Id" />
+
+        <!-- Header -->
+        <div class="row g-4 mb-4">
+
+            <div class="col-md-4">
+                <label class="form-label fw-semibold">Transaction Type</label>
+                <select class="form-select" asp-for="Type" required>
+                    <option value="">-- Select Type --</option>
+                    <option value="0">Buy</option>
+                    <option value="1">Sell</option>
+                </select>
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label fw-semibold">Date</label>
+                <input asp-for="DateTime" type="datetime-local" class="form-control" required />
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label fw-semibold">Customer</label>
+                <select asp-for="CustomerId" class="form-select" required>
+                    <option value="">-- Select Customer --</option>
+                    @foreach (var c in customers)
+                    {
+                        <option value="@c.Id">@($"{c.FirstName} {c.LastName}")</option>
+                    }
+                </select>
+            </div>
+
+        </div>
+
+        <h4 class="fw-semibold mb-3">Invoice Items</h4>
+
+        <div class="table-responsive">
+            <table class="table table-bordered align-middle" id="itemsTable">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width: 25%">Product</th>
+                        <th style="width: 15%">Quantity</th>
+                        <th style="width: 20%">Unit Price</th>
+                        <th style="width: 20%">Total</th>
+                        <th style="width: 20%"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = 0; i < Model.TransactionProducts.Count; i++)
+                    {
+                        <input type="hidden" name="TransactionProducts[@i].Id" value="@Model.TransactionProducts[i].Id" />
+                        <tr>
+                            <td>
+                                @Model.TransactionProducts[i].Product.Title
+                                <input type="hidden" name="TransactionProducts[@i].ProductId" value="@Model.TransactionProducts[i].ProductId" />
+                            </td>
+
+                            <td>
+                                @Model.TransactionProducts[i].Quantity
+                                <input type="hidden" name="TransactionProducts[@i].Quantity" value="@Model.TransactionProducts[i].Quantity" />
+                            </td>
+
+                            <td>
+                                @Model.TransactionProducts[i].UnitPrice.ToString("F2")
+                                <input type="hidden" name="TransactionProducts[@i].UnitPrice" value="@Model.TransactionProducts[i].UnitPrice" />
+                            </td>
+
+                            <td class="text-end total">
+                                @((Model.TransactionProducts[i].Quantity * Model.TransactionProducts[i].UnitPrice).ToString("F2"))
+                            </td>
+
+                            <td class="text-center">
+                                <button type="button" class="btn btn-sm btn-danger rounded-pill" onclick="removeRow(this)">
+                                    Remove
+                                </button>
+                                <button type="button" class="btn btn-sm btn-warning rounded-pill ms-1" onclick="editRow(this)">
+                                    Edit
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="3" class="text-end fw-semibold">Grand Total:</td>
+                        <td colspan="2" class="fw-semibold text-end" id="grandTotal">0.00</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+        <button type="button" class="btn btn-outline-primary mt-2" data-bs-toggle="modal" data-bs-target="#addProductModal">
+            <i class="bi bi-plus-lg"></i> Add Product
+        </button>
+
+        <div class="mt-4 text-end">
+            <button type="submit" class="btn btn-primary px-4">
+                Save Changes
+            </button>
+        </div>
+
+    </form>
+</div>
+
+<!-- Add Product Modal -->
+<div class="modal fade" id="addProductModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4">
+
+            <div class="modal-header">
+                <h5 class="modal-title fw-semibold">Add Product</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Product</label>
+                    <select id="productSelect" class="form-select" onchange="updatePrice()">
+                        <option disabled selected>-- Select Product --</option>
+                        @foreach (var p in products)
+                        {
+                            <option value="@p.Id" data-price="@p.Price">@p.Title</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Quantity</label>
+                    <input id="quantityInput" type="number" class="form-control" placeholder="Enter quantity" />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Unit Price</label>
+                    <input id="priceInput" type="number" class="form-control" placeholder="Enter price" />
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary px-3" onclick="addItem()">Add</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Edit Item Modal -->
+<div class="modal fade" id="editItemModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4">
+            <div class="modal-header">
+                <h5 class="modal-title fw-semibold">Edit Product</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Product</label>
+                    <select id="editProductSelect" class="form-select">
+                        @foreach (var p in products)
+                        {
+                            <option value="@p.Id" data-price="@p.Price">@p.Title</option>
+                        }
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Quantity</label>
+                    <input id="editQuantityInput" type="number" class="form-control" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Unit Price</label>
+                    <input id="editPriceInput" type="number" class="form-control" />
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary px-3" onclick="saveEdit()">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let rowIndex = @Model.TransactionProducts.Count;
+        let currentEditRow = null;
+
+        function updatePrice() {
+            let selected = $("#productSelect option:selected");
+            let price = selected.data("price");
+            $("#priceInput").val(price);
+        }
+
+        function addItem() {
+            let productId = $("#productSelect").val();
+            let productName = $("#productSelect option:selected").text();
+            let qty = parseFloat($("#quantityInput").val());
+            let price = parseFloat($("#priceInput").val());
+
+            if (!productId) { alert("Please select a product."); return; }
+            if (qty <= 0 || isNaN(qty)) { alert("Please enter a valid quantity."); return; }
+            if (price <= 0 || isNaN(price)) { alert("Please enter a valid price."); return; }
+
+            let total = qty * price;
+
+            let row = `
+                <tr>
+                    <td>
+                        ${productName}
+                        <input type="hidden" name="TransactionProducts[${rowIndex}].ProductId" value="${productId}" />
+                    </td>
+                    <td>
+                        ${qty}
+                        <input type="hidden" name="TransactionProducts[${rowIndex}].Quantity" value="${qty}" />
+                    </td>
+                    <td>
+                        ${price.toFixed(2)}
+                        <input type="hidden" name="TransactionProducts[${rowIndex}].UnitPrice" value="${price}" />
+                    </td>
+                    <td class="text-end total">
+                        ${total.toFixed(2)}
+                    </td>
+                    <td class="text-center">
+                        <button type="button" class="btn btn-sm btn-danger rounded-pill" onclick="removeRow(this)">
+                            Remove
+                        </button>
+                        <button type="button" class="btn btn-sm btn-warning rounded-pill ms-1" onclick="editRow(this)">
+                            Edit
+                        </button>
+                    </td>
+                </tr>
+            `;
+
+            $("#itemsTable tbody").append(row);
+            rowIndex++;
+            updateGrandTotal();
+
+            $("#productSelect").val('');
+            $("#quantityInput").val('');
+            $("#priceInput").val('');
+            $("#addProductModal").modal('hide');
+        }
+
+        function removeRow(btn) {
+            $(btn).closest("tr").remove();
+            updateGrandTotal();
+        }
+
+        function editRow(btn) {
+            currentEditRow = $(btn).closest("tr");
+            let productId = currentEditRow.find("input[name*='.ProductId']").val();
+            let qty = parseFloat(currentEditRow.find("input[name*='.Quantity']").val());
+            let price = parseFloat(currentEditRow.find("input[name*='.UnitPrice']").val());
+
+            $("#editProductSelect").val(productId);
+            $("#editQuantityInput").val(qty);
+            $("#editPriceInput").val(price);
+
+            $("#editItemModal").modal('show');
+        }
+
+        function saveEdit() {
+            if (!currentEditRow) return;
+
+            let productId = $("#editProductSelect").val();
+            let productName = $("#editProductSelect option:selected").text();
+            let qty = parseFloat($("#editQuantityInput").val());
+            let price = parseFloat($("#editPriceInput").val());
+
+            if (!productId) { alert("Please select a product."); return; }
+            if (qty <= 0 || isNaN(qty)) { alert("Please enter a valid quantity."); return; }
+            if (price <= 0 || isNaN(price)) { alert("Please enter a valid price."); return; }
+
+            currentEditRow.find("input[name*='.ProductId']").val(productId);
+            currentEditRow.find("td:first").contents().first()[0].textContent = productName;
+
+            currentEditRow.find("input[name*='.Quantity']").val(qty);
+            currentEditRow.find("td:nth-child(2)").contents().first()[0].textContent = qty;
+
+            currentEditRow.find("input[name*='.UnitPrice']").val(price);
+            currentEditRow.find("td:nth-child(3)").contents().first()[0].textContent = price.toFixed(2);
+
+            let total = qty * price;
+            currentEditRow.find(".total").text(total.toFixed(2));
+
+            updateGrandTotal();
+            $("#editItemModal").modal('hide');
+        }
+
+        function updateGrandTotal() {
+            let grandTotal = 0;
+            $("#itemsTable tbody tr").each(function() {
+                let rowTotal = parseFloat($(this).find(".total").text());
+                grandTotal += rowTotal;
+            });
+            $("#grandTotal").text(grandTotal.toFixed(2));
+        }
+
+        function validateForm() {
+            if ($("#itemsTable tbody tr").length === 0) {
+                alert("Please add at least one product to the invoice.");
+                return false;
+            }
+            if (!$("[name='Type']").val()) { alert("Please select transaction type."); return false; }
+            if (!$("[name='CustomerId']").val()) { alert("Please select a customer."); return false; }
+            if (!$("[name='DateTime']").val()) { alert("Please select a date."); return false; }
+            return true;
+        }
+
+        $(document).ready(function() {
+            updateGrandTotal();
+        });
+    </script>
+}

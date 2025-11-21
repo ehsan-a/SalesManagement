@@ -1,0 +1,233 @@
+﻿@using SalesManagement.Models.ViewModels
+@model TransactionCreateViewModel
+
+@{
+    ViewData["Title"] = "Create Transaction";
+    var products = ViewBag.Products as List<Product>;
+    var customers = ViewBag.Customers as List<Customer>;
+}
+
+<div class="container py-4">
+    <h2 class="fw-bold mb-4 text-dark">Create Transaction</h2>
+
+    <form asp-action="Create" method="post" class="shadow-sm p-4 rounded-4 bg-white" onsubmit="return validateForm()">
+
+        <!-- Header -->
+        <div class="row g-4 mb-4">
+
+            <div class="col-md-4">
+                <label class="form-label fw-semibold">Transaction Type</label>
+                <select class="form-select" asp-for="Type" required>
+                    <option value="">-- Select Type --</option>
+                    <option value="0">Buy</option>
+                    <option value="1">Sell</option>
+                </select>
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label fw-semibold">Date</label>
+                <input asp-for="DateTime" type="datetime-local" class="form-control" required />
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label fw-semibold">Customer</label>
+                <select asp-for="CustomerId" class="form-select" required>
+                    <option disabled selected>-- Select Customer --</option>
+                    @foreach (var c in customers)
+                    {
+                        <option value="@c.Id">@(c.FirstName + " " + c.LastName)</option>
+                    }
+                </select>
+            </div>
+
+        </div>
+
+        <h4 class="fw-semibold mb-3">Invoice Items</h4>
+
+        <!-- Details Table -->
+        <div class="table-responsive">
+            <table class="table table-bordered align-middle" id="itemsTable">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width: 25%">Product</th>
+                        <th style="width: 15%">Quantity</th>
+                        <th style="width: 20%">Unit Price</th>
+                        <th style="width: 20%">Total</th>
+                        <th style="width: 10%"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- JS-generated rows -->
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="3" class="text-end fw-semibold">Grand Total:</td>
+                        <td colspan="2" class="fw-semibold text-end" id="grandTotal">0.00</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+        <button type="button" class="btn btn-outline-primary mt-2" data-bs-toggle="modal" data-bs-target="#addProductModal">
+            <i class="bi bi-plus-lg"></i> Add Product
+        </button>
+
+        <div class="mt-4 text-end">
+            <button type="submit" class="btn btn-primary px-4">
+                Save Transaction
+            </button>
+        </div>
+
+    </form>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="addProductModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4">
+
+            <div class="modal-header">
+                <h5 class="modal-title fw-semibold">Add Product</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Product</label>
+                    <select id="productSelect" class="form-select" onchange="updatePrice()">
+                        <option disabled selected>-- Select Product --</option>
+                        @foreach (var p in products)
+                        {
+                            <option value="@p.Id" data-price="@p.Price">@p.Title</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Quantity</label>
+                    <input id="quantityInput" type="number" class="form-control" placeholder="Enter quantity" />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Unit Price</label>
+                    <input id="priceInput" type="number" class="form-control" placeholder="Enter price" />
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary px-3" onclick="addItem()">Add</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let rowIndex = 0;
+
+        function updatePrice() {
+            let selected = $("#productSelect option:selected");
+            let price = selected.data("price");
+            $("#priceInput").val(price);
+        }
+
+        function addItem() {
+            let productId = $("#productSelect").val();
+            let productName = $("#productSelect option:selected").text();
+            let qty = parseFloat($("#quantityInput").val());
+            let price = parseFloat($("#priceInput").val());
+
+            if (!productId) {
+                alert("Please select a product.");
+                return;
+            }
+            if (qty <= 0 || isNaN(qty)) {
+                alert("Please enter a valid quantity.");
+                return;
+            }
+            if (price <= 0 || isNaN(price)) {
+                alert("Please enter a valid price.");
+                return;
+            }
+
+            let total = qty * price;
+
+            let row = `
+                <tr>
+                    <td>
+                        ${productName}
+                        <input type="hidden" name="Items[${rowIndex}].ProductId" value="${productId}" />
+                    </td>
+                    <td>
+                        ${qty}
+                        <input type="hidden" name="Items[${rowIndex}].Quantity" value="${qty}" />
+                    </td>
+                    <td>
+                        ${price.toFixed(2)}
+                        <input type="hidden" name="Items[${rowIndex}].UnitPrice" value="${price}" />
+                    </td>
+                    <td class="text-end total">
+                        ${total.toFixed(2)}
+                    </td>
+                    <td class="text-center">
+                        <button type="button" class="btn btn-sm btn-danger rounded-pill" onclick="removeRow(this)">
+                            Remove
+                        </button>
+                    </td>
+                </tr>
+            `;
+
+            $("#itemsTable tbody").append(row);
+            rowIndex++;
+
+            updateGrandTotal();
+
+            // Reset modal fields
+            $("#productSelect").val('');
+            $("#quantityInput").val('');
+            $("#priceInput").val('');
+
+            $("#addProductModal").modal('hide');
+        }
+
+        function removeRow(btn) {
+            $(btn).closest("tr").remove();
+            updateGrandTotal();
+        }
+
+        function updateGrandTotal() {
+            let grandTotal = 0;
+            $("#itemsTable tbody tr").each(function() {
+                let rowTotal = parseFloat($(this).find(".total").text());
+                grandTotal += rowTotal;
+            });
+            $("#grandTotal").text(grandTotal.toFixed(2));
+        }
+
+        function validateForm() {
+            if ($("#itemsTable tbody tr").length === 0) {
+                alert("Please add at least one product to the invoice.");
+                return false;
+            }
+
+            // Optionally, check header fields
+            if (!$("[name='Type']").val()) {
+                alert("Please select transaction type.");
+                return false;
+            }
+            if (!$("[name='CustomerId']").val()) {
+                alert("Please select a customer.");
+                return false;
+            }
+            if (!$("[name='DateTime']").val()) {
+                alert("Please select a date.");
+                return false;
+            }
+
+            return true;
+        }
+    </script>
+}

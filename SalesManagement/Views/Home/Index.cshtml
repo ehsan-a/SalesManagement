@@ -1,0 +1,244 @@
+﻿@model DashboardViewModel
+@using System.Text.Json
+@using SalesManagement.Models.ViewModels
+
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<style>
+   
+    .chart-card {
+        display: flex;
+        flex-direction: column;
+        height: 400px; 
+    }
+
+    .chart-wrapper {
+        flex: 1;
+        position: relative;
+        min-height: 0; 
+    }
+
+  
+    .summary-card {
+        min-height: 110px;
+    }
+
+
+    .row-eq-height > [class*="col-"] {
+        display: flex;
+        flex-direction: column;
+    }
+</style>
+
+<div class="container py-4">
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold">Electronics Inventory Dashboard</h2>
+        <small class="text-muted">Updated: @DateTime.Now.ToString("yyyy-MM-dd HH:mm")</small>
+    </div>
+
+    <!-- TOP SUMMARY CARDS -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card shadow-sm p-3 rounded-3 summary-card">
+                <small class="text-muted">Total Stock</small>
+                <h3 class="fw-bold mt-2">@Model.TotalStockQuantity</h3>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm p-3 rounded-3 summary-card">
+                <small class="text-muted">Categories</small>
+                <h3 class="fw-bold mt-2">@Model.CategoriesCount</h3>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm p-3 rounded-3 summary-card">
+                <small class="text-muted">Active Parts</small>
+                <h3 class="fw-bold mt-2">@Model.ActiveProductsCount</h3>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm p-3 rounded-3 summary-card">
+                <small class="text-muted">Sales This Month</small>
+                <h3 class="fw-bold mt-2">@Model.SalesThisMonth.ToString("C0")</h3>
+            </div>
+        </div>
+    </div>
+
+    <!-- CHARTS ROW -->
+    <div class="row g-3 mb-4 row-eq-height">
+
+        <!-- Sales Chart -->
+        <div class="col-lg-8 d-flex">
+            <div class="card shadow-sm p-3 rounded-3 chart-card w-100">
+                <h6 class="mb-3">Sales (Last 30 Days)</h6>
+                <div class="chart-wrapper">
+                    <canvas id="salesChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Category Stock Chart -->
+        <div class="col-lg-4 d-flex">
+            <div class="card shadow-sm p-3 rounded-3 chart-card w-100">
+                <h6 class="mb-3">Category Stock Share</h6>
+                <div class="chart-wrapper" style="min-height: 300px;">
+                    <canvas id="categoryChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- MOVEMENT CHART -->
+    <div class="card shadow-sm p-3 rounded-3 mb-4 chart-card">
+        <h6 class="mb-3">Stock Movement (Last 7 Days)</h6>
+        <div class="chart-wrapper">
+            <canvas id="movementChart"></canvas>
+        </div>
+    </div>
+
+    <!-- TABLES -->
+    <div class="row g-3">
+        <!-- Low Stock Alerts -->
+        <div class="col-lg-6">
+            <div class="card shadow-sm p-3 rounded-3">
+                <h6 class="mb-3">Low Stock Alerts</h6>
+                <table class="table table-sm mb-0">
+                    <thead>
+                        <tr>
+                            <th>Part</th>
+                            <th>Category</th>
+                            <th>Stock</th>
+                            <th>Min</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var it in Model.LowStockItems)
+                        {
+                            <tr>
+                                <td>@it.ProductTitle</td>
+                                <td>@it.CategoryTitle</td>
+                                <td>@it.Stock</td>
+                                <td>@it.MinStock</td>
+                                <td>
+                                    <span class="badge @(it.Stock <= it.MinStock ? "bg-danger" : "bg-warning")">
+                                        @(it.Stock <= it.MinStock ? "Low" : "Warning")
+                                    </span>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Recent Transactions -->
+        <div class="col-lg-6">
+            <div class="card shadow-sm p-3 rounded-3">
+                <h6 class="mb-3">Recent Transactions</h6>
+                <table class="table table-sm mb-0">
+                    <thead>
+                        <tr><th>Type</th><th>Part</th><th>Qty</th><th>Date</th></tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var t in Model.RecentTransactions)
+                        {
+                            <tr>
+                                <td>
+                                    <span class="badge @(t.Type == "Buy" ? "bg-success" : "bg-danger")">
+                                        @t.Type
+                                    </span>
+                                </td>
+                                <td>@t.ProductTitle</td>
+                                <td>@t.Quantity</td>
+                                <td>@t.Date.ToString("yyyy-MM-dd")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- CHARTS -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const salesLabels = @Html.Raw(JsonSerializer.Serialize(Model.SalesLast30Labels));
+    const salesValues = @Html.Raw(JsonSerializer.Serialize(Model.SalesLast30Values));
+    const categoryLabels = @Html.Raw(JsonSerializer.Serialize(Model.CategoryLabels));
+    const categoryValues = @Html.Raw(JsonSerializer.Serialize(Model.CategoryStockShare));
+    const movementLabels = @Html.Raw(JsonSerializer.Serialize(Model.MovementLabels));
+    const movementBuy = @Html.Raw(JsonSerializer.Serialize(Model.MovementBuy));
+    const movementSell = @Html.Raw(JsonSerializer.Serialize(Model.MovementSell));
+
+    // Sales Chart
+    new Chart(document.getElementById('salesChart'), {
+        type: 'line',
+        data: {
+            labels: salesLabels,
+            datasets: [{
+                label: 'Sales',
+                data: salesValues,
+                borderColor: '#007bff',
+                backgroundColor: 'rgba(0,123,255,0.2)',
+                tension: 0.3,
+                fill: true,
+                borderWidth: 2,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+
+    // Category Chart
+    new Chart(document.getElementById('categoryChart'), {
+        type: 'doughnut',
+        data: {
+            labels: categoryLabels,
+            datasets: [{
+                data: categoryValues,
+                backgroundColor: [
+                    '#007bff', '#28a745', '#ffc107', '#dc3545', '#6c757d',
+                    '#17a2b8', '#fd7e14', '#6610f2', '#20c997', '#e83e8c'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+
+    // Movement Chart
+    new Chart(document.getElementById('movementChart'), {
+        type: 'bar',
+        data: {
+            labels: movementLabels,
+            datasets: [
+                { label: 'Buy', data: movementBuy, backgroundColor: '#1cc88a' },
+                { label: 'Sell', data: movementSell, backgroundColor: '#e74a3b' }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+</script>
