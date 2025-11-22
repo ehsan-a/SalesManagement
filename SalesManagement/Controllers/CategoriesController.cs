@@ -6,23 +6,24 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using SalesManagement.Data;
-using SalesManagement.Models;
+using SalesManagement.Models.Entities;
+using SalesManagement.Services.Interfaces;
 
 namespace SalesManagement.Controllers
 {
     public class CategoriesController : Controller
     {
-        private readonly SalesManagementContext _context;
+        private readonly IService<Category> _service;
 
-        public CategoriesController(SalesManagementContext context)
+        public CategoriesController(IService<Category> service)
         {
-            _context = context;
+            _service = service;
         }
 
         // GET: Categories
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Category.ToListAsync());
+            return View(await _service.GetAllAsync());
         }
 
         // GET: Categories/Details/5
@@ -32,10 +33,7 @@ namespace SalesManagement.Controllers
             {
                 return NotFound();
             }
-
-            var category = await _context.Category
-                .Include(x=>x.ProductTypes)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var category = await _service.GetByIdAsync(id.Value);
             if (category == null)
             {
                 return NotFound();
@@ -59,8 +57,7 @@ namespace SalesManagement.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(category);
-                await _context.SaveChangesAsync();
+                await _service.CreateAsync(category);
                 return RedirectToAction(nameof(Index));
             }
             return View(category);
@@ -74,7 +71,7 @@ namespace SalesManagement.Controllers
                 return NotFound();
             }
 
-            var category = await _context.Category.FindAsync(id);
+            var category = await _service.GetByIdAsync(id.Value);
             if (category == null)
             {
                 return NotFound();
@@ -98,12 +95,11 @@ namespace SalesManagement.Controllers
             {
                 try
                 {
-                    _context.Update(category);
-                    await _context.SaveChangesAsync();
+                    await _service.UpdateAsync(category);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!CategoryExists(category.Id))
+                    if (await CategoryExists(category.Id) == false)
                     {
                         return NotFound();
                     }
@@ -125,8 +121,7 @@ namespace SalesManagement.Controllers
                 return NotFound();
             }
 
-            var category = await _context.Category
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var category = await _service.GetByIdAsync(id.Value);
             if (category == null)
             {
                 return NotFound();
@@ -140,19 +135,13 @@ namespace SalesManagement.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var category = await _context.Category.FindAsync(id);
-            if (category != null)
-            {
-                _context.Category.Remove(category);
-            }
-
-            await _context.SaveChangesAsync();
+            await _service.DeleteAsync(id);
             return RedirectToAction(nameof(Index));
         }
 
-        private bool CategoryExists(int id)
+        private async Task<bool> CategoryExists(int id)
         {
-            return _context.Category.Any(e => e.Id == id);
+            return await _service.ExistsAsync(id);
         }
     }
 }

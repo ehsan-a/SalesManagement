@@ -1,31 +1,40 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using SalesManagement.Data;
 using SalesManagement.Models;
+using SalesManagement.Models.Entities;
 using SalesManagement.Models.ViewModels;
+using SalesManagement.Services.Implementations;
+using SalesManagement.Services.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
 
 namespace SalesManagement.Controllers
 {
     public class TransactionsController : Controller
     {
         private readonly SalesManagementContext _context;
+        private readonly TransactionService _service;
+        private readonly IService<Product> _productService;
+        private readonly IService<Customer> _customerService;
 
-        public TransactionsController(SalesManagementContext context)
+        public TransactionsController(SalesManagementContext context, IService<Transaction> service, IService<Product> productService, IService<Customer> customerService)
         {
             _context = context;
+            _service = (TransactionService)service;
+            _productService = productService;
+            _customerService = customerService;
+
         }
 
         // GET: Transactions
         public async Task<IActionResult> Index()
         {
-            var salesManagementContext = _context.Transaction.Include(t => t.Customer);
-            return View(await salesManagementContext.ToListAsync());
+            return View(await _service.GetAllAsync());
         }
 
         // GET: Transactions/Details/5
@@ -36,11 +45,7 @@ namespace SalesManagement.Controllers
                 return NotFound();
             }
 
-            var transaction = await _context.Transaction
-                .Include(x => x.TransactionProducts)
-                .ThenInclude(x => x.Product)
-                .Include(t => t.Customer)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var transaction = await _service.GetByIdAsync(id.Value);
             if (transaction == null)
             {
                 return NotFound();
@@ -50,11 +55,11 @@ namespace SalesManagement.Controllers
         }
 
         // GET: Transactions/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
             var vm = new TransactionCreateViewModel();
-            ViewBag.Products = _context.Product.ToList();
-            ViewBag.Customers = _context.Customer.ToList();
+            ViewBag.Products = (await _productService.GetAllAsync()).ToList();
+            ViewBag.Customers = (await _customerService.GetAllAsync()).ToList();
             return View(vm);
         }
 
@@ -78,10 +83,8 @@ namespace SalesManagement.Controllers
                 }).ToList()
             };
 
-            _context.Transaction.Add(transaction);
-            _context.SaveChanges();
-
-            return RedirectToAction("Index");
+            await _service.CreateAsync(transaction);
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Transactions/Edit/5
@@ -92,16 +95,13 @@ namespace SalesManagement.Controllers
                 return NotFound();
             }
 
-            var transaction = await _context.Transaction
-                .Include(x => x.TransactionProducts)
-                .ThenInclude(x => x.Product)
-                .FirstOrDefaultAsync(x => x.Id == id);
+            var transaction = await _service.GetByIdAsync(id.Value);
             if (transaction == null)
             {
                 return NotFound();
             }
-            ViewBag.Products = _context.Product.ToList();
-            ViewBag.Customers = _context.Customer.ToList();
+            ViewBag.Products = (await _productService.GetAllAsync()).ToList();
+            ViewBag.Customers = (await _customerService.GetAllAsync()).ToList();
             return View(transaction);
         }
 
@@ -133,7 +133,7 @@ namespace SalesManagement.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!TransactionExists(transaction.Id))
+                    if (await TransactionExists(transaction.Id) == false)
                     {
                         return NotFound();
                     }
@@ -144,8 +144,8 @@ namespace SalesManagement.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewBag.Products = _context.Product.ToList();
-            ViewBag.Customers = _context.Customer.ToList();
+            ViewBag.Products = (await _productService.GetAllAsync()).ToList();
+            ViewBag.Customers = (await _customerService.GetAllAsync()).ToList();
             return View(transaction);
         }
 
@@ -157,9 +157,7 @@ namespace SalesManagement.Controllers
                 return NotFound();
             }
 
-            var transaction = await _context.Transaction
-                .Include(t => t.Customer)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var transaction = await _service.GetByIdAsync(id.Value);
             if (transaction == null)
             {
                 return NotFound();
@@ -173,19 +171,13 @@ namespace SalesManagement.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var transaction = await _context.Transaction.FindAsync(id);
-            if (transaction != null)
-            {
-                _context.Transaction.Remove(transaction);
-            }
-
-            await _context.SaveChangesAsync();
+            await _service.DeleteAsync(id);
             return RedirectToAction(nameof(Index));
         }
 
-        private bool TransactionExists(int id)
+        private async Task<bool> TransactionExists(int id)
         {
-            return _context.Transaction.Any(e => e.Id == id);
+            return await _service.ExistsAsync(id);
         }
     }
 }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using SalesManagement.Models;
+using SalesManagement.Models.Entities;
 
 namespace SalesManagement.Data
 {
@@ -14,13 +14,13 @@ namespace SalesManagement.Data
         {
         }
 
-        public DbSet<SalesManagement.Models.Customer> Customer { get; set; } = default!;
-        public DbSet<SalesManagement.Models.Category> Category { get; set; } = default!;
-        public DbSet<SalesManagement.Models.Product> Product { get; set; } = default!;
-        public DbSet<SalesManagement.Models.ProductType> ProductType { get; set; } = default!;
-        public DbSet<SalesManagement.Models.Transaction> Transaction { get; set; } = default!;
-        public DbSet<SalesManagement.Models.User> User { get; set; } = default!;
-        public DbSet<SalesManagement.Models.TransactionProduct> TransactionProduct { get; set; } = default!;
+        public DbSet<Customer> Customer { get; set; } = default!;
+        public DbSet<Category> Category { get; set; } = default!;
+        public DbSet<Product> Product { get; set; } = default!;
+        public DbSet<ProductType> ProductType { get; set; } = default!;
+        public DbSet<Transaction> Transaction { get; set; } = default!;
+        public DbSet<User> User { get; set; } = default!;
+        public DbSet<TransactionProduct> TransactionProduct { get; set; } = default!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

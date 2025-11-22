@@ -1,29 +1,33 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using SalesManagement.Data;
-using SalesManagement.Models;
+using SalesManagement.Models.Entities;
+using SalesManagement.Services.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace SalesManagement.Controllers
 {
     public class TransactionProductsController : Controller
     {
-        private readonly SalesManagementContext _context;
+        private readonly IService<TransactionProduct> _service;
+        private readonly IService<Transaction> _transactionService;
+        private readonly IService<Product> _productService;
 
-        public TransactionProductsController(SalesManagementContext context)
+        public TransactionProductsController(IService<TransactionProduct> service, IService<Transaction> transactionService, IService<Product> productService)
         {
-            _context = context;
+            _service = service;
+            _transactionService = transactionService;
+            _productService = productService;
         }
 
         // GET: TransactionProducts
         public async Task<IActionResult> Index()
         {
-            var salesManagementContext = _context.TransactionProduct.Include(t => t.Product).Include(t => t.Transaction);
-            return View(await salesManagementContext.ToListAsync());
+            return View(await _service.GetAllAsync());
         }
 
         // GET: TransactionProducts/Details/5
@@ -34,10 +38,7 @@ namespace SalesManagement.Controllers
                 return NotFound();
             }
 
-            var transactionProduct = await _context.TransactionProduct
-                .Include(t => t.Product)
-                .Include(t => t.Transaction)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var transactionProduct = await _service.GetByIdAsync(id.Value);
             if (transactionProduct == null)
             {
                 return NotFound();
@@ -47,10 +48,10 @@ namespace SalesManagement.Controllers
         }
 
         // GET: TransactionProducts/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            ViewData["ProductId"] = new SelectList(_context.Product, "Id", "Id");
-            ViewData["TransactionId"] = new SelectList(_context.Transaction, "Id", "Id");
+            ViewData["ProductId"] = new SelectList(await _productService.GetAllAsync(), "Id", "Id");
+            ViewData["TransactionId"] = new SelectList(await _transactionService.GetAllAsync(), "Id", "Id");
             return View();
         }
 
@@ -63,12 +64,11 @@ namespace SalesManagement.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(transactionProduct);
-                await _context.SaveChangesAsync();
+                await _service.CreateAsync(transactionProduct);
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ProductId"] = new SelectList(_context.Product, "Id", "Id", transactionProduct.ProductId);
-            ViewData["TransactionId"] = new SelectList(_context.Transaction, "Id", "Id", transactionProduct.TransactionId);
+            ViewData["ProductId"] = new SelectList(await _productService.GetAllAsync(), "Id", "Id", transactionProduct.ProductId);
+            ViewData["TransactionId"] = new SelectList(await _transactionService.GetAllAsync(), "Id", "Id", transactionProduct.TransactionId);
             return View(transactionProduct);
         }
 
@@ -80,13 +80,13 @@ namespace SalesManagement.Controllers
                 return NotFound();
             }
 
-            var transactionProduct = await _context.TransactionProduct.FindAsync(id);
+            var transactionProduct = await _service.GetByIdAsync(id.Value);
             if (transactionProduct == null)
             {
                 return NotFound();
             }
-            ViewData["ProductId"] = new SelectList(_context.Product, "Id", "Id", transactionProduct.ProductId);
-            ViewData["TransactionId"] = new SelectList(_context.Transaction, "Id", "Id", transactionProduct.TransactionId);
+            ViewData["ProductId"] = new SelectList(await _productService.GetAllAsync(), "Id", "Id", transactionProduct.ProductId);
+            ViewData["TransactionId"] = new SelectList(await _transactionService.GetAllAsync(), "Id", "Id", transactionProduct.TransactionId);
             return View(transactionProduct);
         }
 
@@ -106,12 +106,11 @@ namespace SalesManagement.Controllers
             {
                 try
                 {
-                    _context.Update(transactionProduct);
-                    await _context.SaveChangesAsync();
+                    await _service.UpdateAsync(transactionProduct);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!TransactionProductExists(transactionProduct.Id))
+                    if (await TransactionProductExists(transactionProduct.Id) == false)
                     {
                         return NotFound();
                     }
@@ -122,8 +121,8 @@ namespace SalesManagement.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ProductId"] = new SelectList(_context.Product, "Id", "Id", transactionProduct.ProductId);
-            ViewData["TransactionId"] = new SelectList(_context.Transaction, "Id", "Id", transactionProduct.TransactionId);
+            ViewData["ProductId"] = new SelectList(await _productService.GetAllAsync(), "Id", "Id", transactionProduct.ProductId);
+            ViewData["TransactionId"] = new SelectList(await _transactionService.GetAllAsync(), "Id", "Id", transactionProduct.TransactionId);
             return View(transactionProduct);
         }
 
@@ -135,10 +134,7 @@ namespace SalesManagement.Controllers
                 return NotFound();
             }
 
-            var transactionProduct = await _context.TransactionProduct
-                .Include(t => t.Product)
-                .Include(t => t.Transaction)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var transactionProduct = await _service.GetByIdAsync(id.Value);
             if (transactionProduct == null)
             {
                 return NotFound();
@@ -152,19 +148,13 @@ namespace SalesManagement.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var transactionProduct = await _context.TransactionProduct.FindAsync(id);
-            if (transactionProduct != null)
-            {
-                _context.TransactionProduct.Remove(transactionProduct);
-            }
-
-            await _context.SaveChangesAsync();
+            await _service.DeleteAsync(id);
             return RedirectToAction(nameof(Index));
         }
 
-        private bool TransactionProductExists(int id)
+        private async Task<bool> TransactionProductExists(int id)
         {
-            return _context.TransactionProduct.Any(e => e.Id == id);
+            return await _service.ExistsAsync(id);
         }
     }
 }

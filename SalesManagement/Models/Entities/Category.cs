@@ -1,4 +1,4 @@
-﻿namespace SalesManagement.Models
+﻿namespace SalesManagement.Models.Entities
 {
     public class Category
     {

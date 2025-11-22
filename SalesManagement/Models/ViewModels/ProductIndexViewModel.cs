@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using SalesManagement.Models.Entities;
 
 namespace SalesManagement.Models.ViewModels
 {

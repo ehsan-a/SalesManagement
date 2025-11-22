@@ -1,29 +1,31 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using SalesManagement.Data;
-using SalesManagement.Models;
+using SalesManagement.Models.Entities;
+using SalesManagement.Services.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace SalesManagement.Controllers
 {
     public class ProductTypesController : Controller
     {
-        private readonly SalesManagementContext _context;
+        private readonly IService<ProductType> _service;
+        private readonly IService<Category> _categoryService;
 
-        public ProductTypesController(SalesManagementContext context)
+        public ProductTypesController(IService<ProductType> service, IService<Category> categoryService)
         {
-            _context = context;
+            _service = service;
+            _categoryService = categoryService;
         }
 
         // GET: ProductTypes
         public async Task<IActionResult> Index()
         {
-            var salesManagementContext = _context.ProductType.Include(p => p.Category);
-            return View(await salesManagementContext.ToListAsync());
+            return View(await _service.GetAllAsync());
         }
 
         // GET: ProductTypes/Details/5
@@ -34,10 +36,7 @@ namespace SalesManagement.Controllers
                 return NotFound();
             }
 
-            var productType = await _context.ProductType
-                .Include(p => p.Products)
-                .Include(p => p.Category)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var productType = await _service.GetByIdAsync(id.Value);
             if (productType == null)
             {
                 return NotFound();
@@ -47,9 +46,9 @@ namespace SalesManagement.Controllers
         }
 
         // GET: ProductTypes/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            ViewData["CategoryId"] = new SelectList(_context.Category, "Id", "Title");
+            ViewData["CategoryId"] = new SelectList(await _categoryService.GetAllAsync(), "Id", "Title");
             return View();
         }
 
@@ -62,11 +61,10 @@ namespace SalesManagement.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(productType);
-                await _context.SaveChangesAsync();
+                await _service.CreateAsync(productType);
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CategoryId"] = new SelectList(_context.Category, "Id", "Title", productType.CategoryId);
+            ViewData["CategoryId"] = new SelectList(await _categoryService.GetAllAsync(), "Id", "Title", productType.CategoryId);
             return View(productType);
         }
 
@@ -78,12 +76,12 @@ namespace SalesManagement.Controllers
                 return NotFound();
             }
 
-            var productType = await _context.ProductType.FindAsync(id);
+            var productType = await _service.GetByIdAsync(id.Value);
             if (productType == null)
             {
                 return NotFound();
             }
-            ViewData["CategoryId"] = new SelectList(_context.Category, "Id", "Title", productType.CategoryId);
+            ViewData["CategoryId"] = new SelectList(await _categoryService.GetAllAsync(), "Id", "Title", productType.CategoryId);
             return View(productType);
         }
 
@@ -103,12 +101,11 @@ namespace SalesManagement.Controllers
             {
                 try
                 {
-                    _context.Update(productType);
-                    await _context.SaveChangesAsync();
+                    await _service.UpdateAsync(productType);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!ProductTypeExists(productType.Id))
+                    if (await ProductTypeExists(productType.Id) == false)
                     {
                         return NotFound();
                     }
@@ -119,7 +116,7 @@ namespace SalesManagement.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CategoryId"] = new SelectList(_context.Category, "Id", "Id", productType.CategoryId);
+            ViewData["CategoryId"] = new SelectList(await _categoryService.GetAllAsync(), "Id", "Id", productType.CategoryId);
             return View(productType);
         }
 
@@ -131,9 +128,7 @@ namespace SalesManagement.Controllers
                 return NotFound();
             }
 
-            var productType = await _context.ProductType
-                .Include(p => p.Category)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var productType = await _service.GetByIdAsync(id.Value);
             if (productType == null)
             {
                 return NotFound();
@@ -147,19 +142,13 @@ namespace SalesManagement.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var productType = await _context.ProductType.FindAsync(id);
-            if (productType != null)
-            {
-                _context.ProductType.Remove(productType);
-            }
-
-            await _context.SaveChangesAsync();
+            await _service.DeleteAsync(id);
             return RedirectToAction(nameof(Index));
         }
 
-        private bool ProductTypeExists(int id)
+        private async Task<bool> ProductTypeExists(int id)
         {
-            return _context.ProductType.Any(e => e.Id == id);
+            return await _service.ExistsAsync(id);
         }
     }
 }

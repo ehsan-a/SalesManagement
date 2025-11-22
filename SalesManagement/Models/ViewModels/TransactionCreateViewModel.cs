@@ -1,4 +1,6 @@
-﻿namespace SalesManagement.Models.ViewModels
+﻿using SalesManagement.Models.Entities;
+
+namespace SalesManagement.Models.ViewModels
 {
     public class TransactionCreateViewModel
     {

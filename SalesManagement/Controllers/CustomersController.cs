@@ -1,28 +1,29 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using SalesManagement.Data;
-using SalesManagement.Models;
+using SalesManagement.Models.Entities;
+using SalesManagement.Services.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace SalesManagement.Controllers
 {
     public class CustomersController : Controller
     {
-        private readonly SalesManagementContext _context;
+        private readonly IService<Customer> _service;
 
-        public CustomersController(SalesManagementContext context)
+        public CustomersController(IService<Customer> service)
         {
-            _context = context;
+            _service = service;
         }
 
         // GET: Customers
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Customer.ToListAsync());
+            return View(await _service.GetAllAsync());
         }
 
         // GET: Customers/Details/5
@@ -33,9 +34,7 @@ namespace SalesManagement.Controllers
                 return NotFound();
             }
 
-            var customer = await _context.Customer
-                .Include(x => x.Transactions)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var customer = await _service.GetByIdAsync(id.Value);
             if (customer == null)
             {
                 return NotFound();
@@ -59,8 +58,7 @@ namespace SalesManagement.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(customer);
-                await _context.SaveChangesAsync();
+                await _service.CreateAsync(customer);
                 return RedirectToAction(nameof(Index));
             }
             return View(customer);
@@ -74,7 +72,7 @@ namespace SalesManagement.Controllers
                 return NotFound();
             }
 
-            var customer = await _context.Customer.FindAsync(id);
+            var customer = await _service.GetByIdAsync(id.Value);
             if (customer == null)
             {
                 return NotFound();
@@ -98,12 +96,11 @@ namespace SalesManagement.Controllers
             {
                 try
                 {
-                    _context.Update(customer);
-                    await _context.SaveChangesAsync();
+                    await _service.UpdateAsync(customer);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!CustomerExists(customer.Id))
+                    if (await CustomerExists(customer.Id) == false)
                     {
                         return NotFound();
                     }
@@ -125,8 +122,7 @@ namespace SalesManagement.Controllers
                 return NotFound();
             }
 
-            var customer = await _context.Customer
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var customer = await _service.GetByIdAsync(id.Value);
             if (customer == null)
             {
                 return NotFound();
@@ -140,19 +136,13 @@ namespace SalesManagement.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var customer = await _context.Customer.FindAsync(id);
-            if (customer != null)
-            {
-                _context.Customer.Remove(customer);
-            }
-
-            await _context.SaveChangesAsync();
+            await _service.DeleteAsync(id);
             return RedirectToAction(nameof(Index));
         }
 
-        private bool CustomerExists(int id)
+        private async Task<bool> CustomerExists(int id)
         {
-            return _context.Customer.Any(e => e.Id == id);
+            return await _service.ExistsAsync(id);
         }
     }
 }

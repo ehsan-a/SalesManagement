@@ -1,70 +1,38 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using SalesManagement.Data;
-using SalesManagement.Models;
+using SalesManagement.Models.Entities;
 using SalesManagement.Models.ViewModels;
+using SalesManagement.Services.Implementations;
+using SalesManagement.Services.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace SalesManagement.Controllers
 {
     public class ProductsController : Controller
     {
-        private readonly SalesManagementContext _context;
+        private readonly ProductService _service;
+        private readonly IService<Category> _categoryService;
+        private readonly IService<ProductType> _productTypeService;
 
-        public ProductsController(SalesManagementContext context)
+        public ProductsController(IService<Product> service, IService<Category> categoryService, IService<ProductType> productTypeService)
         {
-            _context = context;
+            _service = (ProductService)service;
+            _categoryService = categoryService;
+            _productTypeService = productTypeService;
         }
 
         // GET: Products
         public async Task<IActionResult> Index(string searchString, string productType, string productCategory)
         {
-            var items =
-                _context.Product.Include(x => x.Type).ThenInclude(x => x.Category).Select(x =>
-                new StockDto
-                {
-                    Product = x,
-                    Quantity = x.TransactionProducts
-                    .Sum(x => (x.Transaction.Type == TranactionType.Buy ? x.Quantity : -x.Quantity))
-                });
-            if (!string.IsNullOrEmpty(searchString))
-            {
-                items = items.Where(x => x.Product.Title.ToUpper().Contains(searchString.ToUpper())).Select(x =>
-                new StockDto
-                {
-                    Product = x.Product,
-                    Quantity = x.Product.TransactionProducts
-                    .Sum(x => (x.Transaction.Type == TranactionType.Buy ? x.Quantity : -x.Quantity))
-                });
-            }
-
-            if (!string.IsNullOrEmpty(productCategory))
-            {
-                items = items.Where(x => x.Product.Type.CategoryId == int.Parse(productCategory)).Select(x =>
-                new StockDto
-                {
-                    Product = x.Product,
-                    Quantity = x.Product.TransactionProducts
-                    .Sum(x => (x.Transaction.Type == TranactionType.Buy ? x.Quantity : -x.Quantity))
-                });
-
-            }
-            if (!string.IsNullOrEmpty(productType))
-            {
-                items = items.Where(x => x.Product.TypeId == int.Parse(productType)).Select(x =>
-                new StockDto
-                {
-                    Product = x.Product,
-                    Quantity = x.Product.TransactionProducts
-                    .Sum(x => (x.Transaction.Type == TranactionType.Buy ? x.Quantity : -x.Quantity))
-                });
-            }
-            IEnumerable<ProductType> types = _context.ProductType;
-            IEnumerable<Category> categories = _context.Category;
+            IEnumerable<StockDto> items = await _service.GetItemsAsync();
+            items = _service.Filter(items, searchString, productType, productCategory);
+            IEnumerable<ProductType> types = await _productTypeService.GetAllAsync();
+            IEnumerable<Category> categories = await _categoryService.GetAllAsync();
             var vm = new ProductIndexViewModel
             {
                 SelectListCategory = new SelectList(categories, "Id", "Title", productCategory),
@@ -83,10 +51,7 @@ namespace SalesManagement.Controllers
                 return NotFound();
             }
 
-            var product = await _context.Product
-                .Include(x => x.TransactionProducts)
-                .Include(p => p.Type)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var product = await _service.GetByIdAsync(id.Value);
             if (product == null)
             {
                 return NotFound();
@@ -96,9 +61,9 @@ namespace SalesManagement.Controllers
         }
 
         // GET: Products/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            ViewData["TypeId"] = new SelectList(_context.Set<ProductType>(), "Id", "Title");
+            ViewData["TypeId"] = new SelectList(await _productTypeService.GetAllAsync(), "Id", "Title");
             return View();
         }
 
@@ -107,15 +72,14 @@ namespace SalesManagement.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title,Price,TypeId")] Product product)
+        public async Task<IActionResult> Create([Bind("Id,Title,Price,TypeId,MinQuantity,IsActive")] Product product)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(product);
-                await _context.SaveChangesAsync();
+                await _service.CreateAsync(product);
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["TypeId"] = new SelectList(_context.Set<ProductType>(), "Id", "Title", product.TypeId);
+            ViewData["TypeId"] = new SelectList(await _productTypeService.GetAllAsync(), "Id", "Title", product.TypeId);
             return View(product);
         }
 
@@ -127,12 +91,12 @@ namespace SalesManagement.Controllers
                 return NotFound();
             }
 
-            var product = await _context.Product.FindAsync(id);
+            var product = await _service.GetByIdAsync(id.Value);
             if (product == null)
             {
                 return NotFound();
             }
-            ViewData["TypeId"] = new SelectList(_context.Set<ProductType>(), "Id", "Title", product.TypeId);
+            ViewData["TypeId"] = new SelectList(await _productTypeService.GetAllAsync(), "Id", "Title", product.TypeId);
             return View(product);
         }
 
@@ -141,7 +105,7 @@ namespace SalesManagement.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Price,TypeId")] Product product)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Price,TypeId,MinQuantity,IsActive")] Product product)
         {
             if (id != product.Id)
             {
@@ -152,12 +116,11 @@ namespace SalesManagement.Controllers
             {
                 try
                 {
-                    _context.Update(product);
-                    await _context.SaveChangesAsync();
+                    await _service.UpdateAsync(product);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!ProductExists(product.Id))
+                    if (await ProductExists(product.Id) == false)
                     {
                         return NotFound();
                     }
@@ -168,7 +131,7 @@ namespace SalesManagement.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["TypeId"] = new SelectList(_context.Set<ProductType>(), "Id", "Title", product.TypeId);
+            ViewData["TypeId"] = new SelectList(await _productTypeService.GetAllAsync(), "Id", "Title", product.TypeId);
             return View(product);
         }
 
@@ -180,9 +143,7 @@ namespace SalesManagement.Controllers
                 return NotFound();
             }
 
-            var product = await _context.Product
-                .Include(p => p.Type)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var product = await _service.GetByIdAsync(id.Value);
             if (product == null)
             {
                 return NotFound();
@@ -196,19 +157,13 @@ namespace SalesManagement.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var product = await _context.Product.FindAsync(id);
-            if (product != null)
-            {
-                _context.Product.Remove(product);
-            }
-
-            await _context.SaveChangesAsync();
+            await _service.DeleteAsync(id);
             return RedirectToAction(nameof(Index));
         }
 
-        private bool ProductExists(int id)
+        private async Task<bool> ProductExists(int id)
         {
-            return _context.Product.Any(e => e.Id == id);
+            return await _service.ExistsAsync(id);
         }
     }
 }
