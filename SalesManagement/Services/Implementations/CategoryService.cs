@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace SalesManagement.Services.Implementations
 {
-    public class CategoryService : IService<Category>
+    public class CategoryService : ICategoryService
     {
         private readonly IGenericRepository<Category> _repository;
         private readonly SalesManagementContext _context;
@@ -54,7 +54,7 @@ namespace SalesManagement.Services.Implementations
                 {
                     Title = c.Title,
                     Stock = _context.TransactionProduct.Where(p => p.Product.Type.CategoryId == c.Id).Sum(x =>
-                     (x.Transaction.Type == TranactionType.Buy ? x.Quantity : -x.Quantity))
+                     (x.Transaction.Type == TransactionType.Buy ? x.Quantity : -x.Quantity))
                 });
         }
         public IEnumerable<Category> Filter(IEnumerable<Category> items, string searchString)

@@ -86,16 +86,16 @@ namespace SalesManagement.Data
             );
 
             modelBuilder.Entity<Transaction>().HasData(
-                new Transaction { Id = 1, Type = TranactionType.Buy, DateTime = DateTime.Now.AddDays(-1), CustomerId = 1 },
-                new Transaction { Id = 2, Type = TranactionType.Buy, DateTime = DateTime.Now.AddDays(-2), CustomerId = 2 },
-                new Transaction { Id = 3, Type = TranactionType.Buy, DateTime = DateTime.Now.AddDays(-3), CustomerId = 3 },
-                new Transaction { Id = 4, Type = TranactionType.Sell, DateTime = DateTime.Now.AddDays(-4), CustomerId = 4 },
-                new Transaction { Id = 5, Type = TranactionType.Sell, DateTime = DateTime.Now.AddDays(-5), CustomerId = 5 },
-                new Transaction { Id = 6, Type = TranactionType.Buy, DateTime = DateTime.Now.AddDays(-6), CustomerId = 6 },
-                new Transaction { Id = 7, Type = TranactionType.Sell, DateTime = DateTime.Now.AddDays(-7), CustomerId = 7 },
-                new Transaction { Id = 8, Type = TranactionType.Buy, DateTime = DateTime.Now.AddDays(-8), CustomerId = 8 },
-                new Transaction { Id = 9, Type = TranactionType.Sell, DateTime = DateTime.Now.AddDays(-9), CustomerId = 9 },
-                new Transaction { Id = 10, Type = TranactionType.Sell, DateTime = DateTime.Now.AddDays(-10), CustomerId = 10 }
+                new Transaction { Id = 1, Type = TransactionType.Buy, DateTime = DateTime.Now.AddDays(-1), CustomerId = 1 },
+                new Transaction { Id = 2, Type = TransactionType.Buy, DateTime = DateTime.Now.AddDays(-2), CustomerId = 2 },
+                new Transaction { Id = 3, Type = TransactionType.Buy, DateTime = DateTime.Now.AddDays(-3), CustomerId = 3 },
+                new Transaction { Id = 4, Type = TransactionType.Sell, DateTime = DateTime.Now.AddDays(-4), CustomerId = 4 },
+                new Transaction { Id = 5, Type = TransactionType.Sell, DateTime = DateTime.Now.AddDays(-5), CustomerId = 5 },
+                new Transaction { Id = 6, Type = TransactionType.Buy, DateTime = DateTime.Now.AddDays(-6), CustomerId = 6 },
+                new Transaction { Id = 7, Type = TransactionType.Sell, DateTime = DateTime.Now.AddDays(-7), CustomerId = 7 },
+                new Transaction { Id = 8, Type = TransactionType.Buy, DateTime = DateTime.Now.AddDays(-8), CustomerId = 8 },
+                new Transaction { Id = 9, Type = TransactionType.Sell, DateTime = DateTime.Now.AddDays(-9), CustomerId = 9 },
+                new Transaction { Id = 10, Type = TransactionType.Sell, DateTime = DateTime.Now.AddDays(-10), CustomerId = 10 }
             );
 
             modelBuilder.Entity<TransactionProduct>().HasData(

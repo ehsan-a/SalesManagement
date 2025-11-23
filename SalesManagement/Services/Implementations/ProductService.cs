@@ -9,7 +9,7 @@ using SalesManagement.Models.DTOs;
 
 namespace SalesManagement.Services.Implementations
 {
-    public class ProductService : IService<Product>
+    public class ProductService : IProductService
     {
         private readonly IGenericRepository<Product> _repository;
 
@@ -51,7 +51,7 @@ namespace SalesManagement.Services.Implementations
             {
                 Product = p,
                 Quantity = p.TransactionProducts?
-                    .Sum(tp => (tp.Transaction.Type == TranactionType.Buy ? tp.Quantity : -tp.Quantity)) ?? 0
+                    .Sum(tp => (tp.Transaction.Type == TransactionType.Buy ? tp.Quantity : -tp.Quantity)) ?? 0
             });
         }
 
@@ -63,7 +63,7 @@ namespace SalesManagement.Services.Implementations
                 {
                     Product = p.Product,
                     Quantity = p.Product.TransactionProducts?
-                    .Sum(tp => (tp.Transaction.Type == TranactionType.Buy ? tp.Quantity : -tp.Quantity)) ?? 0
+                    .Sum(tp => (tp.Transaction.Type == TransactionType.Buy ? tp.Quantity : -tp.Quantity)) ?? 0
                 });
             }
             if (!string.IsNullOrEmpty(productCategory))
@@ -72,7 +72,7 @@ namespace SalesManagement.Services.Implementations
                 {
                     Product = p.Product,
                     Quantity = p.Product.TransactionProducts?
-                    .Sum(tp => (tp.Transaction.Type == TranactionType.Buy ? tp.Quantity : -tp.Quantity)) ?? 0
+                    .Sum(tp => (tp.Transaction.Type == TransactionType.Buy ? tp.Quantity : -tp.Quantity)) ?? 0
                 });
 
             }
@@ -82,7 +82,7 @@ namespace SalesManagement.Services.Implementations
                 {
                     Product = p.Product,
                     Quantity = p.Product.TransactionProducts?
-                    .Sum(tp => (tp.Transaction.Type == TranactionType.Buy ? tp.Quantity : -tp.Quantity)) ?? 0
+                    .Sum(tp => (tp.Transaction.Type == TransactionType.Buy ? tp.Quantity : -tp.Quantity)) ?? 0
                 });
             }
             return items;
@@ -91,7 +91,7 @@ namespace SalesManagement.Services.Implementations
         {
             var products = await GetAllAsync();
             return products.Sum(p => p.TransactionProducts?
-                    .Sum(tp => (tp.Transaction.Type == TranactionType.Buy ? tp.Quantity : -tp.Quantity)) ?? 0);
+                    .Sum(tp => (tp.Transaction.Type == TransactionType.Buy ? tp.Quantity : -tp.Quantity)) ?? 0);
         }
         public async Task<int> GetActiveCountAsync()
         {
@@ -103,14 +103,14 @@ namespace SalesManagement.Services.Implementations
         {
             var products = await GetAllAsync();
             return products
-      .Where(p => p.TransactionProducts.Sum(x => (x.Transaction.Type == TranactionType.Buy ? x.Quantity : -x.Quantity)) <= p.MinQuantity)
-          .OrderBy(p => p.TransactionProducts.Sum(x => (x.Transaction.Type == TranactionType.Buy ? x.Quantity : -x.Quantity)))
+      .Where(p => p.TransactionProducts.Sum(x => (x.Transaction.Type == TransactionType.Buy ? x.Quantity : -x.Quantity)) <= p.MinQuantity)
+          .OrderBy(p => p.TransactionProducts.Sum(x => (x.Transaction.Type == TransactionType.Buy ? x.Quantity : -x.Quantity)))
           .Select(p => new LowStockItemDto
           {
               ProductId = p.Id,
               ProductTitle = p.Title,
               CategoryTitle = p.Type.Category.Title,
-              Stock = p.TransactionProducts.Sum(x => (x.Transaction.Type == TranactionType.Buy ? x.Quantity : -x.Quantity)),
+              Stock = p.TransactionProducts.Sum(x => (x.Transaction.Type == TransactionType.Buy ? x.Quantity : -x.Quantity)),
               MinStock = p.MinQuantity
           }).ToList();
         }

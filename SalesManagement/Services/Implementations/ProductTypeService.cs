@@ -7,7 +7,7 @@ using SalesManagement.Services.Interfaces;
 
 namespace SalesManagement.Services.Implementations
 {
-    public class ProductTypeService : IService<ProductType>
+    public class ProductTypeService : IProductTypeService
     {
         private readonly IGenericRepository<ProductType> _repository;
         private readonly SalesManagementContext _context;

@@ -15,11 +15,11 @@ namespace SalesManagement.Controllers
 {
     public class CategoriesController : Controller
     {
-        private readonly CategoryService _service;
+        private readonly ICategoryService _service;
 
-        public CategoriesController(IService<Category> service)
+        public CategoriesController(ICategoryService service)
         {
-            _service = (CategoryService)service;
+            _service = service;
         }
 
         // GET: Categories

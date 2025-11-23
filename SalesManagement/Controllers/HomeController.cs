@@ -12,17 +12,17 @@ namespace SalesManagement.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-        private readonly ProductService _productService;
-        private readonly CategoryService _categoryService;
-        private readonly TransactionService _transactionService;
-        private readonly TransactionProductService _transactionProductService;
-        public HomeController(ILogger<HomeController> logger, IService<Product> productService, IService<Category> categoryService, IService<Transaction> transactionService, IService<TransactionProduct> transactionProductService)
+        private readonly IProductService _productService;
+        private readonly ICategoryService _categoryService;
+        private readonly ITransactionService _transactionService;
+        private readonly ITransactionProductService _transactionProductService;
+        public HomeController(ILogger<HomeController> logger, IProductService productService, ICategoryService categoryService, ITransactionService transactionService, ITransactionProductService transactionProductService)
         {
             _logger = logger;
-            _productService = (ProductService)productService;
-            _categoryService = (CategoryService)categoryService;
-            _transactionService = (TransactionService)transactionService;
-            _transactionProductService = (TransactionProductService)transactionProductService;
+            _productService = productService;
+            _categoryService = categoryService;
+            _transactionService = transactionService;
+            _transactionProductService = transactionProductService;
         }
 
         public async Task<IActionResult> Index()
@@ -51,8 +51,8 @@ namespace SalesManagement.Controllers
             var movements = await _transactionService.GetMovementsAsync();
             foreach (var day in last7)
             {
-                var buy = movements.Where(m => m.DateTime.Date == day.Date && m.TranactionType == TranactionType.Buy).Sum(m => m.Quantity);
-                var sell = movements.Where(m => m.DateTime.Date == day.Date && m.TranactionType == TranactionType.Sell).Sum(m => m.Quantity);
+                var buy = movements.Where(m => m.DateTime.Date == day.Date && m.TransactionType == TransactionType.Buy).Sum(m => m.Quantity);
+                var sell = movements.Where(m => m.DateTime.Date == day.Date && m.TransactionType == TransactionType.Sell).Sum(m => m.Quantity);
                 vm.MovementBuy.Add(buy);
                 vm.MovementSell.Add(sell);
             }

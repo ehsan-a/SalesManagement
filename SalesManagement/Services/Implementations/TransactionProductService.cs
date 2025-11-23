@@ -9,7 +9,7 @@ using SalesManagement.Models.DTOs;
 
 namespace SalesManagement.Services.Implementations
 {
-    public class TransactionProductService : IService<TransactionProduct>
+    public class TransactionProductService : ITransactionProductService
     {
         private readonly IGenericRepository<TransactionProduct> _repository;
         private readonly SalesManagementContext _context;
@@ -32,9 +32,9 @@ namespace SalesManagement.Services.Implementations
             await _context.SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<TransactionProduct>> GetAllAsync() =>await _repository.GetAllAsync(x => x.Include(x => x.Product).Include(x => x.Transaction));
+        public async Task<IEnumerable<TransactionProduct>> GetAllAsync() => await _repository.GetAllAsync(x => x.Include(x => x.Product).Include(x => x.Transaction));
 
-        public async Task<TransactionProduct?> GetByIdAsync(int id) =>await _repository.GetByIdAsync(id, x => x.Include(x => x.Product).Include(x => x.Transaction));
+        public async Task<TransactionProduct?> GetByIdAsync(int id) => await _repository.GetByIdAsync(id, x => x.Include(x => x.Product).Include(x => x.Transaction));
 
         public async Task UpdateAsync(TransactionProduct transactionProduct)
         {
@@ -52,7 +52,7 @@ namespace SalesManagement.Services.Implementations
                      .Select(tp => new RecentTransactionDto
                      {
                          TransactionId = tp.TransactionId,
-                         Type = tp.Transaction.Type == TranactionType.Sell ? "Sell" : "Buy",
+                         Type = tp.Transaction.Type == TransactionType.Sell ? "Sell" : "Buy",
                          ProductTitle = tp.Product.Title,
                          Quantity = tp.Quantity,
                          Date = tp.Transaction.DateTime

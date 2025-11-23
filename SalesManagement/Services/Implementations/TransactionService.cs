@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace SalesManagement.Services.Implementations
 {
-    public class TransactionService : IService<Transaction>
+    public class TransactionService : ITransactionService
     {
         private readonly IGenericRepository<Transaction> _repository;
         private readonly SalesManagementContext _context;
@@ -48,46 +48,45 @@ namespace SalesManagement.Services.Implementations
         {
             var transactions = await GetAllAsync();
             return transactions
-                .Where(t => t.DateTime >= startOfMonth && t.Type == TranactionType.Sell)
-                  .SelectMany(t => t.TransactionProducts)
+                .Where(t => t.DateTime >= startOfMonth && t.Type == TransactionType.Sell)
+                  .SelectMany(t => t.TransactionProducts ?? Enumerable.Empty<TransactionProduct>())
                   .Sum(tp => tp.UnitPrice * tp.Quantity);
         }
         public async Task<IEnumerable<SalesByDayDto>> GetSalesByDayAsync()
         {
             var transactions = await GetAllAsync();
             return transactions
-                .Where(t => t.DateTime >= DateTime.Today.AddDays(-29) && t.Type == TranactionType.Sell)
-                .SelectMany(t => t.TransactionProducts.Select(tp => new SalesByDayDto
+                .Where(t => t.DateTime >= DateTime.Today.AddDays(-29) && t.Type == TransactionType.Sell)
+                .SelectMany(t => (t.TransactionProducts ?? Enumerable.Empty<TransactionProduct>()).Select(tp => new SalesByDayDto
                 {
                     DateTime = t.DateTime,
                     Quantity = tp.Quantity,
                     UnitPrice = tp.UnitPrice
                 }));
         }
-
         public async Task<IEnumerable<MovementsDto>> GetMovementsAsync()
         {
             var transactions = await GetAllAsync();
             return transactions
                  .Where(t => t.DateTime >= DateTime.Today.AddDays(-6))
-                 .SelectMany(t => t.TransactionProducts.Select(tp => new MovementsDto
+                 .SelectMany(t => (t.TransactionProducts ?? Enumerable.Empty<TransactionProduct>()).Select(tp => new MovementsDto
                  {
                      DateTime = t.DateTime,
-                     TranactionType = t.Type,
+                     TransactionType = t.Type,
                      Quantity = tp.Quantity
                  }));
         }
 
         public IEnumerable<Transaction> Filter(IEnumerable<Transaction> items, string transactionType, string transactionCustomer, string fromDate, string toDate)
         {
-            if (!string.IsNullOrEmpty(fromDate))
+            if (!string.IsNullOrEmpty(fromDate) && DateTime.TryParse(fromDate, out var from))
             {
-                items = items.Where(x => Convert.ToDateTime(fromDate).DayOfYear <= x.DateTime.DayOfYear);
+                items = items.Where(x => from <= x.DateTime);
             }
 
-            if (!string.IsNullOrEmpty(toDate))
+            if (!string.IsNullOrEmpty(toDate) && DateTime.TryParse(toDate, out var to))
             {
-                items = items.Where(x => Convert.ToDateTime(toDate).DayOfYear >= x.DateTime.DayOfYear);
+                items = items.Where(x => to >= x.DateTime);
             }
 
             if (!string.IsNullOrEmpty(transactionType))

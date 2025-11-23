@@ -18,14 +18,14 @@ namespace SalesManagement.Controllers
     public class TransactionsController : Controller
     {
         private readonly SalesManagementContext _context;
-        private readonly TransactionService _service;
+        private readonly ITransactionService _service;
         private readonly IService<Product> _productService;
         private readonly IService<Customer> _customerService;
 
-        public TransactionsController(SalesManagementContext context, IService<Transaction> service, IService<Product> productService, IService<Customer> customerService)
+        public TransactionsController(SalesManagementContext context, ITransactionService service, IService<Product> productService, IService<Customer> customerService)
         {
             _context = context;
-            _service = (TransactionService)service;
+            _service = service;
             _productService = productService;
             _customerService = customerService;
 

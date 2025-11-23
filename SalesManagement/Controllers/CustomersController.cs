@@ -14,11 +14,11 @@ namespace SalesManagement.Controllers
 {
     public class CustomersController : Controller
     {
-        private readonly CustomerService _service;
+        private readonly ICustomerService _service;
 
-        public CustomersController(IService<Customer> service)
+        public CustomersController(ICustomerService service)
         {
-            _service = (CustomerService)service;
+            _service = service;
         }
 
         // GET: Customers

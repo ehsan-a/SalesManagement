@@ -127,7 +127,7 @@ namespace SalesManagement.Migrations
                     ProductId = table.Column<int>(type: "int", nullable: false),
                     TransactionId = table.Column<int>(type: "int", nullable: false),
                     Quantity = table.Column<int>(type: "int", nullable: false),
-                    UnitPrice = table.Column<int>(type: "int", nullable: false)
+                    UnitPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -212,16 +212,16 @@ namespace SalesManagement.Migrations
                 columns: new[] { "Id", "CustomerId", "DateTime", "Type" },
                 values: new object[,]
                 {
-                    { 1, 1, new DateTime(2025, 11, 22, 11, 10, 32, 525, DateTimeKind.Local).AddTicks(7907), 0 },
-                    { 2, 2, new DateTime(2025, 11, 21, 11, 10, 32, 525, DateTimeKind.Local).AddTicks(7970), 0 },
-                    { 3, 3, new DateTime(2025, 11, 20, 11, 10, 32, 525, DateTimeKind.Local).AddTicks(7973), 0 },
-                    { 4, 4, new DateTime(2025, 11, 19, 11, 10, 32, 525, DateTimeKind.Local).AddTicks(7975), 1 },
-                    { 5, 5, new DateTime(2025, 11, 18, 11, 10, 32, 525, DateTimeKind.Local).AddTicks(7976), 1 },
-                    { 6, 6, new DateTime(2025, 11, 17, 11, 10, 32, 525, DateTimeKind.Local).AddTicks(7977), 0 },
-                    { 7, 7, new DateTime(2025, 11, 16, 11, 10, 32, 525, DateTimeKind.Local).AddTicks(7979), 1 },
-                    { 8, 8, new DateTime(2025, 11, 15, 11, 10, 32, 525, DateTimeKind.Local).AddTicks(7980), 0 },
-                    { 9, 9, new DateTime(2025, 11, 14, 11, 10, 32, 525, DateTimeKind.Local).AddTicks(7982), 1 },
-                    { 10, 10, new DateTime(2025, 11, 13, 11, 10, 32, 525, DateTimeKind.Local).AddTicks(7984), 1 }
+                    { 1, 1, new DateTime(2025, 11, 22, 17, 56, 17, 730, DateTimeKind.Local).AddTicks(5769), 0 },
+                    { 2, 2, new DateTime(2025, 11, 21, 17, 56, 17, 730, DateTimeKind.Local).AddTicks(5786), 0 },
+                    { 3, 3, new DateTime(2025, 11, 20, 17, 56, 17, 730, DateTimeKind.Local).AddTicks(5790), 0 },
+                    { 4, 4, new DateTime(2025, 11, 19, 17, 56, 17, 730, DateTimeKind.Local).AddTicks(5792), 1 },
+                    { 5, 5, new DateTime(2025, 11, 18, 17, 56, 17, 730, DateTimeKind.Local).AddTicks(5794), 1 },
+                    { 6, 6, new DateTime(2025, 11, 17, 17, 56, 17, 730, DateTimeKind.Local).AddTicks(5796), 0 },
+                    { 7, 7, new DateTime(2025, 11, 16, 17, 56, 17, 730, DateTimeKind.Local).AddTicks(5797), 1 },
+                    { 8, 8, new DateTime(2025, 11, 15, 17, 56, 17, 730, DateTimeKind.Local).AddTicks(5798), 0 },
+                    { 9, 9, new DateTime(2025, 11, 14, 17, 56, 17, 730, DateTimeKind.Local).AddTicks(5800), 1 },
+                    { 10, 10, new DateTime(2025, 11, 13, 17, 56, 17, 730, DateTimeKind.Local).AddTicks(5801), 1 }
                 });
 
             migrationBuilder.InsertData(
@@ -246,20 +246,20 @@ namespace SalesManagement.Migrations
                 columns: new[] { "Id", "ProductId", "Quantity", "TransactionId", "UnitPrice" },
                 values: new object[,]
                 {
-                    { 1, 1, 1000, 1, 200 },
-                    { 2, 2, 800, 1, 150 },
-                    { 3, 3, 200, 2, 3000 },
-                    { 4, 4, 150, 2, 3500 },
-                    { 5, 5, 100, 3, 1200 },
-                    { 6, 6, 50, 3, 9000 },
-                    { 7, 1, 100, 4, 200 },
-                    { 8, 3, 20, 5, 3000 },
-                    { 9, 8, 20, 6, 58000 },
-                    { 10, 9, 40, 6, 25000 },
-                    { 11, 9, 5, 7, 25000 },
-                    { 12, 10, 10, 8, 120000 },
-                    { 13, 10, 1, 9, 120000 },
-                    { 14, 2, 50, 10, 150 }
+                    { 1, 1, 1000, 1, 200m },
+                    { 2, 2, 800, 1, 150m },
+                    { 3, 3, 200, 2, 3000m },
+                    { 4, 4, 150, 2, 3500m },
+                    { 5, 5, 100, 3, 1200m },
+                    { 6, 6, 50, 3, 9000m },
+                    { 7, 1, 100, 4, 200m },
+                    { 8, 3, 20, 5, 3000m },
+                    { 9, 8, 20, 6, 58000m },
+                    { 10, 9, 40, 6, 25000m },
+                    { 11, 9, 5, 7, 25000m },
+                    { 12, 10, 10, 8, 120000m },
+                    { 13, 10, 1, 9, 120000m },
+                    { 14, 2, 50, 10, 150m }
                 });
 
             migrationBuilder.CreateIndex(

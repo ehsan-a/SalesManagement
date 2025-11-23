@@ -8,6 +8,6 @@
         public int TransactionId { get; set; }
         public Transaction? Transaction { get; set; }
         public int Quantity { get; set; }
-        public int UnitPrice { get; set; }
+        public decimal UnitPrice { get; set; }
     }
 }

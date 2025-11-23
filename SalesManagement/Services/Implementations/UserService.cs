@@ -5,7 +5,7 @@ using SalesManagement.Services.Interfaces;
 
 namespace SalesManagement.Services.Implementations
 {
-    public class UserService : IService<User>
+    public class UserService : IUserService
     {
         private readonly IGenericRepository<User> _repository;
         private readonly SalesManagementContext _context;

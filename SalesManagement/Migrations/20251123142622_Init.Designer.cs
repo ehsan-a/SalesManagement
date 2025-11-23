@@ -12,7 +12,7 @@ using SalesManagement.Data;
 namespace SalesManagement.Migrations
 {
     [DbContext(typeof(SalesManagementContext))]
-    [Migration("20251123074037_Init")]
+    [Migration("20251123142622_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -412,70 +412,70 @@ namespace SalesManagement.Migrations
                         {
                             Id = 1,
                             CustomerId = 1,
-                            DateTime = new DateTime(2025, 11, 22, 11, 10, 32, 525, DateTimeKind.Local).AddTicks(7907),
+                            DateTime = new DateTime(2025, 11, 22, 17, 56, 17, 730, DateTimeKind.Local).AddTicks(5769),
                             Type = 0
                         },
                         new
                         {
                             Id = 2,
                             CustomerId = 2,
-                            DateTime = new DateTime(2025, 11, 21, 11, 10, 32, 525, DateTimeKind.Local).AddTicks(7970),
+                            DateTime = new DateTime(2025, 11, 21, 17, 56, 17, 730, DateTimeKind.Local).AddTicks(5786),
                             Type = 0
                         },
                         new
                         {
                             Id = 3,
                             CustomerId = 3,
-                            DateTime = new DateTime(2025, 11, 20, 11, 10, 32, 525, DateTimeKind.Local).AddTicks(7973),
+                            DateTime = new DateTime(2025, 11, 20, 17, 56, 17, 730, DateTimeKind.Local).AddTicks(5790),
                             Type = 0
                         },
                         new
                         {
                             Id = 4,
                             CustomerId = 4,
-                            DateTime = new DateTime(2025, 11, 19, 11, 10, 32, 525, DateTimeKind.Local).AddTicks(7975),
+                            DateTime = new DateTime(2025, 11, 19, 17, 56, 17, 730, DateTimeKind.Local).AddTicks(5792),
                             Type = 1
                         },
                         new
                         {
                             Id = 5,
                             CustomerId = 5,
-                            DateTime = new DateTime(2025, 11, 18, 11, 10, 32, 525, DateTimeKind.Local).AddTicks(7976),
+                            DateTime = new DateTime(2025, 11, 18, 17, 56, 17, 730, DateTimeKind.Local).AddTicks(5794),
                             Type = 1
                         },
                         new
                         {
                             Id = 6,
                             CustomerId = 6,
-                            DateTime = new DateTime(2025, 11, 17, 11, 10, 32, 525, DateTimeKind.Local).AddTicks(7977),
+                            DateTime = new DateTime(2025, 11, 17, 17, 56, 17, 730, DateTimeKind.Local).AddTicks(5796),
                             Type = 0
                         },
                         new
                         {
                             Id = 7,
                             CustomerId = 7,
-                            DateTime = new DateTime(2025, 11, 16, 11, 10, 32, 525, DateTimeKind.Local).AddTicks(7979),
+                            DateTime = new DateTime(2025, 11, 16, 17, 56, 17, 730, DateTimeKind.Local).AddTicks(5797),
                             Type = 1
                         },
                         new
                         {
                             Id = 8,
                             CustomerId = 8,
-                            DateTime = new DateTime(2025, 11, 15, 11, 10, 32, 525, DateTimeKind.Local).AddTicks(7980),
+                            DateTime = new DateTime(2025, 11, 15, 17, 56, 17, 730, DateTimeKind.Local).AddTicks(5798),
                             Type = 0
                         },
                         new
                         {
                             Id = 9,
                             CustomerId = 9,
-                            DateTime = new DateTime(2025, 11, 14, 11, 10, 32, 525, DateTimeKind.Local).AddTicks(7982),
+                            DateTime = new DateTime(2025, 11, 14, 17, 56, 17, 730, DateTimeKind.Local).AddTicks(5800),
                             Type = 1
                         },
                         new
                         {
                             Id = 10,
                             CustomerId = 10,
-                            DateTime = new DateTime(2025, 11, 13, 11, 10, 32, 525, DateTimeKind.Local).AddTicks(7984),
+                            DateTime = new DateTime(2025, 11, 13, 17, 56, 17, 730, DateTimeKind.Local).AddTicks(5801),
                             Type = 1
                         });
                 });
@@ -497,8 +497,8 @@ namespace SalesManagement.Migrations
                     b.Property<int>("TransactionId")
                         .HasColumnType("int");
 
-                    b.Property<int>("UnitPrice")
-                        .HasColumnType("int");
+                    b.Property<decimal>("UnitPrice")
+                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
 
@@ -515,7 +515,7 @@ namespace SalesManagement.Migrations
                             ProductId = 1,
                             Quantity = 1000,
                             TransactionId = 1,
-                            UnitPrice = 200
+                            UnitPrice = 200m
                         },
                         new
                         {
@@ -523,7 +523,7 @@ namespace SalesManagement.Migrations
                             ProductId = 2,
                             Quantity = 800,
                             TransactionId = 1,
-                            UnitPrice = 150
+                            UnitPrice = 150m
                         },
                         new
                         {
@@ -531,7 +531,7 @@ namespace SalesManagement.Migrations
                             ProductId = 3,
                             Quantity = 200,
                             TransactionId = 2,
-                            UnitPrice = 3000
+                            UnitPrice = 3000m
                         },
                         new
                         {
@@ -539,7 +539,7 @@ namespace SalesManagement.Migrations
                             ProductId = 4,
                             Quantity = 150,
                             TransactionId = 2,
-                            UnitPrice = 3500
+                            UnitPrice = 3500m
                         },
                         new
                         {
@@ -547,7 +547,7 @@ namespace SalesManagement.Migrations
                             ProductId = 5,
                             Quantity = 100,
                             TransactionId = 3,
-                            UnitPrice = 1200
+                            UnitPrice = 1200m
                         },
                         new
                         {
@@ -555,7 +555,7 @@ namespace SalesManagement.Migrations
                             ProductId = 6,
                             Quantity = 50,
                             TransactionId = 3,
-                            UnitPrice = 9000
+                            UnitPrice = 9000m
                         },
                         new
                         {
@@ -563,7 +563,7 @@ namespace SalesManagement.Migrations
                             ProductId = 1,
                             Quantity = 100,
                             TransactionId = 4,
-                            UnitPrice = 200
+                            UnitPrice = 200m
                         },
                         new
                         {
@@ -571,7 +571,7 @@ namespace SalesManagement.Migrations
                             ProductId = 3,
                             Quantity = 20,
                             TransactionId = 5,
-                            UnitPrice = 3000
+                            UnitPrice = 3000m
                         },
                         new
                         {
@@ -579,7 +579,7 @@ namespace SalesManagement.Migrations
                             ProductId = 8,
                             Quantity = 20,
                             TransactionId = 6,
-                            UnitPrice = 58000
+                            UnitPrice = 58000m
                         },
                         new
                         {
@@ -587,7 +587,7 @@ namespace SalesManagement.Migrations
                             ProductId = 9,
                             Quantity = 40,
                             TransactionId = 6,
-                            UnitPrice = 25000
+                            UnitPrice = 25000m
                         },
                         new
                         {
@@ -595,7 +595,7 @@ namespace SalesManagement.Migrations
                             ProductId = 9,
                             Quantity = 5,
                             TransactionId = 7,
-                            UnitPrice = 25000
+                            UnitPrice = 25000m
                         },
                         new
                         {
@@ -603,7 +603,7 @@ namespace SalesManagement.Migrations
                             ProductId = 10,
                             Quantity = 10,
                             TransactionId = 8,
-                            UnitPrice = 120000
+                            UnitPrice = 120000m
                         },
                         new
                         {
@@ -611,7 +611,7 @@ namespace SalesManagement.Migrations
                             ProductId = 10,
                             Quantity = 1,
                             TransactionId = 9,
-                            UnitPrice = 120000
+                            UnitPrice = 120000m
                         },
                         new
                         {
@@ -619,7 +619,7 @@ namespace SalesManagement.Migrations
                             ProductId = 2,
                             Quantity = 50,
                             TransactionId = 10,
-                            UnitPrice = 150
+                            UnitPrice = 150m
                         });
                 });
 

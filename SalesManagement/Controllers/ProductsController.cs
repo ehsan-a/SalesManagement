@@ -16,13 +16,13 @@ namespace SalesManagement.Controllers
 {
     public class ProductsController : Controller
     {
-        private readonly ProductService _service;
+        private readonly IProductService _service;
         private readonly IService<Category> _categoryService;
         private readonly IService<ProductType> _productTypeService;
 
-        public ProductsController(IService<Product> service, IService<Category> categoryService, IService<ProductType> productTypeService)
+        public ProductsController(IProductService service, IService<Category> categoryService, IService<ProductType> productTypeService)
         {
-            _service = (ProductService)service;
+            _service = service;
             _categoryService = categoryService;
             _productTypeService = productTypeService;
         }
