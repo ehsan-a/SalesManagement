@@ -31,11 +31,11 @@
         </div>
         <div class="col-md-3">
             <label class="form-label fw-semibold">From</label>
-            <input type="date" asp-for="fromDate" value="@Model.fromDate" class="form-control" />
+            <input type="datetime-local" asp-for="fromDate" value="@Model.fromDate" class="form-control" />
         </div>
         <div class="col-md-3">
             <label class="form-label fw-semibold">To</label>
-            <input type="date" asp-for="toDate" value="@Model.toDate" class="form-control" />
+            <input type="datetime-local" asp-for="toDate" value="@Model.toDate" class="form-control" />
         </div>
         <div class="col-md-2 d-grid">
             <button type="submit" class="btn btn-outline-primary rounded-pill">
