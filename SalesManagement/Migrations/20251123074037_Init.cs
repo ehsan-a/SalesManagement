@@ -181,6 +181,16 @@ namespace SalesManagement.Migrations
                 });
 
             migrationBuilder.InsertData(
+                table: "User",
+                columns: new[] { "Id", "FirstName", "LastName" },
+                values: new object[,]
+                {
+                    { 1, "Ehsan", "Arefzadeh" },
+                    { 2, "Reza", "Naghavi" },
+                    { 3, "Sina", "Moradi" }
+                });
+
+            migrationBuilder.InsertData(
                 table: "ProductType",
                 columns: new[] { "Id", "CategoryId", "Title" },
                 values: new object[,]
@@ -202,16 +212,16 @@ namespace SalesManagement.Migrations
                 columns: new[] { "Id", "CustomerId", "DateTime", "Type" },
                 values: new object[,]
                 {
-                    { 1, 1, new DateTime(2025, 11, 20, 11, 54, 46, 670, DateTimeKind.Local).AddTicks(1744), 0 },
-                    { 2, 2, new DateTime(2025, 11, 19, 11, 54, 46, 670, DateTimeKind.Local).AddTicks(1773), 0 },
-                    { 3, 3, new DateTime(2025, 11, 18, 11, 54, 46, 670, DateTimeKind.Local).AddTicks(1774), 0 },
-                    { 4, 4, new DateTime(2025, 11, 17, 11, 54, 46, 670, DateTimeKind.Local).AddTicks(1775), 1 },
-                    { 5, 5, new DateTime(2025, 11, 16, 11, 54, 46, 670, DateTimeKind.Local).AddTicks(1777), 1 },
-                    { 6, 6, new DateTime(2025, 11, 15, 11, 54, 46, 670, DateTimeKind.Local).AddTicks(1778), 0 },
-                    { 7, 7, new DateTime(2025, 11, 14, 11, 54, 46, 670, DateTimeKind.Local).AddTicks(1779), 1 },
-                    { 8, 8, new DateTime(2025, 11, 13, 11, 54, 46, 670, DateTimeKind.Local).AddTicks(1781), 0 },
-                    { 9, 9, new DateTime(2025, 11, 12, 11, 54, 46, 670, DateTimeKind.Local).AddTicks(1782), 1 },
-                    { 10, 10, new DateTime(2025, 11, 11, 11, 54, 46, 670, DateTimeKind.Local).AddTicks(1783), 1 }
+                    { 1, 1, new DateTime(2025, 11, 22, 11, 10, 32, 525, DateTimeKind.Local).AddTicks(7907), 0 },
+                    { 2, 2, new DateTime(2025, 11, 21, 11, 10, 32, 525, DateTimeKind.Local).AddTicks(7970), 0 },
+                    { 3, 3, new DateTime(2025, 11, 20, 11, 10, 32, 525, DateTimeKind.Local).AddTicks(7973), 0 },
+                    { 4, 4, new DateTime(2025, 11, 19, 11, 10, 32, 525, DateTimeKind.Local).AddTicks(7975), 1 },
+                    { 5, 5, new DateTime(2025, 11, 18, 11, 10, 32, 525, DateTimeKind.Local).AddTicks(7976), 1 },
+                    { 6, 6, new DateTime(2025, 11, 17, 11, 10, 32, 525, DateTimeKind.Local).AddTicks(7977), 0 },
+                    { 7, 7, new DateTime(2025, 11, 16, 11, 10, 32, 525, DateTimeKind.Local).AddTicks(7979), 1 },
+                    { 8, 8, new DateTime(2025, 11, 15, 11, 10, 32, 525, DateTimeKind.Local).AddTicks(7980), 0 },
+                    { 9, 9, new DateTime(2025, 11, 14, 11, 10, 32, 525, DateTimeKind.Local).AddTicks(7982), 1 },
+                    { 10, 10, new DateTime(2025, 11, 13, 11, 10, 32, 525, DateTimeKind.Local).AddTicks(7984), 1 }
                 });
 
             migrationBuilder.InsertData(

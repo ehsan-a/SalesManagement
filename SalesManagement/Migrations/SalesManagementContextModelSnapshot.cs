@@ -22,7 +22,7 @@ namespace SalesManagement.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("SalesManagement.Models.Category", b =>
+            modelBuilder.Entity("SalesManagement.Models.Entities.Category", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -91,7 +91,7 @@ namespace SalesManagement.Migrations
                         });
                 });
 
-            modelBuilder.Entity("SalesManagement.Models.Customer", b =>
+            modelBuilder.Entity("SalesManagement.Models.Entities.Customer", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -174,7 +174,7 @@ namespace SalesManagement.Migrations
                         });
                 });
 
-            modelBuilder.Entity("SalesManagement.Models.Product", b =>
+            modelBuilder.Entity("SalesManagement.Models.Entities.Product", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -297,7 +297,7 @@ namespace SalesManagement.Migrations
                         });
                 });
 
-            modelBuilder.Entity("SalesManagement.Models.ProductType", b =>
+            modelBuilder.Entity("SalesManagement.Models.Entities.ProductType", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -381,7 +381,7 @@ namespace SalesManagement.Migrations
                         });
                 });
 
-            modelBuilder.Entity("SalesManagement.Models.Transaction", b =>
+            modelBuilder.Entity("SalesManagement.Models.Entities.Transaction", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -409,75 +409,75 @@ namespace SalesManagement.Migrations
                         {
                             Id = 1,
                             CustomerId = 1,
-                            DateTime = new DateTime(2025, 11, 20, 11, 54, 46, 670, DateTimeKind.Local).AddTicks(1744),
+                            DateTime = new DateTime(2025, 11, 22, 11, 10, 32, 525, DateTimeKind.Local).AddTicks(7907),
                             Type = 0
                         },
                         new
                         {
                             Id = 2,
                             CustomerId = 2,
-                            DateTime = new DateTime(2025, 11, 19, 11, 54, 46, 670, DateTimeKind.Local).AddTicks(1773),
+                            DateTime = new DateTime(2025, 11, 21, 11, 10, 32, 525, DateTimeKind.Local).AddTicks(7970),
                             Type = 0
                         },
                         new
                         {
                             Id = 3,
                             CustomerId = 3,
-                            DateTime = new DateTime(2025, 11, 18, 11, 54, 46, 670, DateTimeKind.Local).AddTicks(1774),
+                            DateTime = new DateTime(2025, 11, 20, 11, 10, 32, 525, DateTimeKind.Local).AddTicks(7973),
                             Type = 0
                         },
                         new
                         {
                             Id = 4,
                             CustomerId = 4,
-                            DateTime = new DateTime(2025, 11, 17, 11, 54, 46, 670, DateTimeKind.Local).AddTicks(1775),
+                            DateTime = new DateTime(2025, 11, 19, 11, 10, 32, 525, DateTimeKind.Local).AddTicks(7975),
                             Type = 1
                         },
                         new
                         {
                             Id = 5,
                             CustomerId = 5,
-                            DateTime = new DateTime(2025, 11, 16, 11, 54, 46, 670, DateTimeKind.Local).AddTicks(1777),
+                            DateTime = new DateTime(2025, 11, 18, 11, 10, 32, 525, DateTimeKind.Local).AddTicks(7976),
                             Type = 1
                         },
                         new
                         {
                             Id = 6,
                             CustomerId = 6,
-                            DateTime = new DateTime(2025, 11, 15, 11, 54, 46, 670, DateTimeKind.Local).AddTicks(1778),
+                            DateTime = new DateTime(2025, 11, 17, 11, 10, 32, 525, DateTimeKind.Local).AddTicks(7977),
                             Type = 0
                         },
                         new
                         {
                             Id = 7,
                             CustomerId = 7,
-                            DateTime = new DateTime(2025, 11, 14, 11, 54, 46, 670, DateTimeKind.Local).AddTicks(1779),
+                            DateTime = new DateTime(2025, 11, 16, 11, 10, 32, 525, DateTimeKind.Local).AddTicks(7979),
                             Type = 1
                         },
                         new
                         {
                             Id = 8,
                             CustomerId = 8,
-                            DateTime = new DateTime(2025, 11, 13, 11, 54, 46, 670, DateTimeKind.Local).AddTicks(1781),
+                            DateTime = new DateTime(2025, 11, 15, 11, 10, 32, 525, DateTimeKind.Local).AddTicks(7980),
                             Type = 0
                         },
                         new
                         {
                             Id = 9,
                             CustomerId = 9,
-                            DateTime = new DateTime(2025, 11, 12, 11, 54, 46, 670, DateTimeKind.Local).AddTicks(1782),
+                            DateTime = new DateTime(2025, 11, 14, 11, 10, 32, 525, DateTimeKind.Local).AddTicks(7982),
                             Type = 1
                         },
                         new
                         {
                             Id = 10,
                             CustomerId = 10,
-                            DateTime = new DateTime(2025, 11, 11, 11, 54, 46, 670, DateTimeKind.Local).AddTicks(1783),
+                            DateTime = new DateTime(2025, 11, 13, 11, 10, 32, 525, DateTimeKind.Local).AddTicks(7984),
                             Type = 1
                         });
                 });
 
-            modelBuilder.Entity("SalesManagement.Models.TransactionProduct", b =>
+            modelBuilder.Entity("SalesManagement.Models.Entities.TransactionProduct", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -620,7 +620,7 @@ namespace SalesManagement.Migrations
                         });
                 });
 
-            modelBuilder.Entity("SalesManagement.Models.User", b =>
+            modelBuilder.Entity("SalesManagement.Models.Entities.User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -639,11 +639,31 @@ namespace SalesManagement.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("User");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            FirstName = "Ehsan",
+                            LastName = "Arefzadeh"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            FirstName = "Reza",
+                            LastName = "Naghavi"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            FirstName = "Sina",
+                            LastName = "Moradi"
+                        });
                 });
 
-            modelBuilder.Entity("SalesManagement.Models.Product", b =>
+            modelBuilder.Entity("SalesManagement.Models.Entities.Product", b =>
                 {
-                    b.HasOne("SalesManagement.Models.ProductType", "Type")
+                    b.HasOne("SalesManagement.Models.Entities.ProductType", "Type")
                         .WithMany("Products")
                         .HasForeignKey("TypeId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -652,9 +672,9 @@ namespace SalesManagement.Migrations
                     b.Navigation("Type");
                 });
 
-            modelBuilder.Entity("SalesManagement.Models.ProductType", b =>
+            modelBuilder.Entity("SalesManagement.Models.Entities.ProductType", b =>
                 {
-                    b.HasOne("SalesManagement.Models.Category", "Category")
+                    b.HasOne("SalesManagement.Models.Entities.Category", "Category")
                         .WithMany("ProductTypes")
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -663,9 +683,9 @@ namespace SalesManagement.Migrations
                     b.Navigation("Category");
                 });
 
-            modelBuilder.Entity("SalesManagement.Models.Transaction", b =>
+            modelBuilder.Entity("SalesManagement.Models.Entities.Transaction", b =>
                 {
-                    b.HasOne("SalesManagement.Models.Customer", "Customer")
+                    b.HasOne("SalesManagement.Models.Entities.Customer", "Customer")
                         .WithMany("Transactions")
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -674,15 +694,15 @@ namespace SalesManagement.Migrations
                     b.Navigation("Customer");
                 });
 
-            modelBuilder.Entity("SalesManagement.Models.TransactionProduct", b =>
+            modelBuilder.Entity("SalesManagement.Models.Entities.TransactionProduct", b =>
                 {
-                    b.HasOne("SalesManagement.Models.Product", "Product")
+                    b.HasOne("SalesManagement.Models.Entities.Product", "Product")
                         .WithMany("TransactionProducts")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("SalesManagement.Models.Transaction", "Transaction")
+                    b.HasOne("SalesManagement.Models.Entities.Transaction", "Transaction")
                         .WithMany("TransactionProducts")
                         .HasForeignKey("TransactionId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -693,27 +713,27 @@ namespace SalesManagement.Migrations
                     b.Navigation("Transaction");
                 });
 
-            modelBuilder.Entity("SalesManagement.Models.Category", b =>
+            modelBuilder.Entity("SalesManagement.Models.Entities.Category", b =>
                 {
                     b.Navigation("ProductTypes");
                 });
 
-            modelBuilder.Entity("SalesManagement.Models.Customer", b =>
+            modelBuilder.Entity("SalesManagement.Models.Entities.Customer", b =>
                 {
                     b.Navigation("Transactions");
                 });
 
-            modelBuilder.Entity("SalesManagement.Models.Product", b =>
+            modelBuilder.Entity("SalesManagement.Models.Entities.Product", b =>
                 {
                     b.Navigation("TransactionProducts");
                 });
 
-            modelBuilder.Entity("SalesManagement.Models.ProductType", b =>
+            modelBuilder.Entity("SalesManagement.Models.Entities.ProductType", b =>
                 {
                     b.Navigation("Products");
                 });
 
-            modelBuilder.Entity("SalesManagement.Models.Transaction", b =>
+            modelBuilder.Entity("SalesManagement.Models.Entities.Transaction", b =>
                 {
                     b.Navigation("TransactionProducts");
                 });
