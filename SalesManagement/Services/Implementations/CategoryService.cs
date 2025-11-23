@@ -2,6 +2,7 @@
 using SalesManagement.Data;
 using SalesManagement.Models.DTOs;
 using SalesManagement.Models.Entities;
+using SalesManagement.Models.ViewModels;
 using SalesManagement.Repositories.Interfaces;
 using SalesManagement.Services.Interfaces;
 using System.Threading.Tasks;
@@ -22,7 +23,6 @@ namespace SalesManagement.Services.Implementations
             await _repository.AddAsync(category);
             await _context.SaveChangesAsync();
         }
-
         public async Task DeleteAsync(int id)
         {
             var item = await _repository.GetByIdAsync(id);
@@ -56,6 +56,14 @@ namespace SalesManagement.Services.Implementations
                     Stock = _context.TransactionProduct.Where(p => p.Product.Type.CategoryId == c.Id).Sum(x =>
                      (x.Transaction.Type == TranactionType.Buy ? x.Quantity : -x.Quantity))
                 });
+        }
+        public IEnumerable<Category> Filter(IEnumerable<Category> items, string searchString)
+        {
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                items = items.Where(x => x.Title.ToUpper().Contains(searchString.ToUpper()));
+            }
+            return items;
         }
     }
 }

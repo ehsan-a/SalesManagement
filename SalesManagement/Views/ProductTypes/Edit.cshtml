@@ -15,32 +15,38 @@
         </a>
     </div>
 
-    <!-- Edit Form Card -->
+    <!-- Edit ProductType Card -->
     <div class="card shadow-sm rounded-4 mx-auto" style="max-width: 600px;">
         <div class="card-body p-4 p-md-5">
-            <h4 class="fw-semibold mb-3">Product Type Details</h4>
+            <h2 class="card-title fw-bold mb-3">Product Type Details</h2>
             <hr />
 
             <form asp-action="Edit" class="needs-validation" novalidate>
-                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
                 <input type="hidden" asp-for="Id" />
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
+                <!-- Title -->
                 <div class="mb-3">
                     <label asp-for="Title" class="form-label fw-semibold"></label>
                     <input asp-for="Title" class="form-control" />
                     <span asp-validation-for="Title" class="text-danger"></span>
                 </div>
 
+                <!-- Category -->
                 <div class="mb-3">
                     <label asp-for="CategoryId" class="form-label fw-semibold"></label>
                     <select asp-for="CategoryId" class="form-select" asp-items="ViewBag.CategoryId"></select>
                     <span asp-validation-for="CategoryId" class="text-danger"></span>
                 </div>
 
-                <div class="text-end">
+                <!-- Action Buttons -->
+                <div class="d-flex justify-content-end gap-2 mt-4">
                     <button type="submit" class="btn btn-primary rounded-pill px-4">
-                        <i class="bi bi-save me-2"></i> Save
+                        <i class="bi bi-check2-circle me-2"></i> Save
                     </button>
+                    <a asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4">
+                        <i class="bi bi-x-circle me-2"></i> Cancel
+                    </a>
                 </div>
             </form>
         </div>

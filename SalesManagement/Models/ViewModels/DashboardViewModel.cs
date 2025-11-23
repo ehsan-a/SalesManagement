@@ -1,4 +1,5 @@
-﻿namespace SalesManagement.Models.ViewModels
+﻿using SalesManagement.Models.DTOs;
+namespace SalesManagement.Models.ViewModels
 {
     public class DashboardViewModel
     {
@@ -18,21 +19,4 @@
         public List<RecentTransactionDto> RecentTransactions { get; set; } = new();
     }
 
-    public class LowStockItemDto
-    {
-        public int ProductId { get; set; }
-        public string ProductTitle { get; set; } = "";
-        public string CategoryTitle { get; set; } = "";
-        public int Stock { get; set; }
-        public int MinStock { get; set; }
-    }
-
-    public class RecentTransactionDto
-    {
-        public int TransactionId { get; set; }
-        public string Type { get; set; } = "";
-        public string ProductTitle { get; set; } = "";
-        public int Quantity { get; set; }
-        public DateTime Date { get; set; }
-    }
 }

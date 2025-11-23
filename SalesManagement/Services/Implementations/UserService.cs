@@ -39,5 +39,18 @@ namespace SalesManagement.Services.Implementations
         }
         public async Task<bool> ExistsAsync(int id) => await _repository.ExistsAsync(id);
 
+        public IEnumerable<User> Filter(IEnumerable<User> items, string searchFirstName, string searchLastName)
+        {
+            if (!string.IsNullOrEmpty(searchFirstName))
+            {
+                items = items.Where(x => x.FirstName.ToUpper().Contains(searchFirstName.ToUpper()));
+            }
+            if (!string.IsNullOrEmpty(searchLastName))
+            {
+                items = items.Where(x => x.LastName.ToUpper().Contains(searchLastName.ToUpper()));
+            }
+            return items;
+        }
+
     }
 }

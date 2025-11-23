@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SalesManagement.Data;
 using SalesManagement.Models.Entities;
+using SalesManagement.Models.ViewModels;
 using SalesManagement.Repositories.Interfaces;
 using SalesManagement.Services.Interfaces;
 
@@ -40,5 +41,18 @@ namespace SalesManagement.Services.Implementations
         }
         public async Task<bool> ExistsAsync(int id) => await _repository.ExistsAsync(id);
 
+        public IEnumerable<ProductType> Filter(IEnumerable<ProductType> items, string searchString, string productTypeCategory)
+        {
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                items = items.Where(x => x.Title.ToUpper().Contains(searchString.ToUpper()));
+            }
+            if (!string.IsNullOrEmpty(productTypeCategory))
+            {
+                items = items.Where(x => x.CategoryId == int.Parse(productTypeCategory));
+
+            }
+            return items;
+        }
     }
 }

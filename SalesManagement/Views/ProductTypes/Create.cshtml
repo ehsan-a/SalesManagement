@@ -15,44 +15,49 @@
         </a>
     </div>
 
-    <!-- Create Form Card -->
-    <div class="card shadow-sm rounded-4 mx-auto" style="max-width: 500px;">
+    <!-- Form Card -->
+    <div class="card shadow-sm rounded-4 mx-auto" style="max-width: 650px;">
         <div class="card-body p-4 p-md-5">
-            <h2 class="card-title fw-bold mb-3">Product Type Details</h2>
-            <hr />
 
             <form asp-action="Create" class="needs-validation" novalidate>
-                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-4"></div>
 
                 <!-- Title -->
                 <div class="mb-3">
                     <label asp-for="Title" class="form-label fw-semibold"></label>
-                    <input asp-for="Title" class="form-control" />
+                    <input asp-for="Title" class="form-control" placeholder="Enter product type title" />
                     <span asp-validation-for="Title" class="text-danger"></span>
                 </div>
 
                 <!-- Category -->
                 <div class="mb-3">
-                    <label asp-for="CategoryId" class="form-label fw-semibold"></label>
-                    <select asp-for="CategoryId" class="form-select" asp-items="ViewBag.CategoryId"></select>
+                    <label asp-for="CategoryId" class="form-label fw-semibold">Category</label>
+                    <select asp-for="CategoryId" class="form-select" asp-items="ViewBag.CategoryId">
+                        <option value="">Select category...</option>
+                    </select>
                     <span asp-validation-for="CategoryId" class="text-danger"></span>
                 </div>
 
                 <!-- Action Buttons -->
-                <div class="d-flex justify-content-end gap-2">
+                <div class="d-flex justify-content-end gap-2 mt-4">
                     <button type="submit" class="btn btn-primary rounded-pill px-4">
-                        <i class="bi bi-plus-circle me-2"></i> Create
+                        <i class="bi bi-plus-circle me-2"></i> Create Product Type
                     </button>
                     <a asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4">
-                        <i class="bi bi-x-circle me-2"></i> Cancel
+                        Cancel
                     </a>
                 </div>
+
             </form>
+
         </div>
     </div>
 
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

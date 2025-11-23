@@ -79,6 +79,12 @@ namespace SalesManagement.Data
                 new Customer { Id = 10, FirstName = "Hassan", LastName = "Moradi" }
             );
 
+            modelBuilder.Entity<User>().HasData(
+                new User { Id = 1, FirstName = "Ehsan", LastName = "Arefzadeh" },
+                new User { Id = 2, FirstName = "Reza", LastName = "Naghavi" },
+                new User { Id = 3, FirstName = "Sina", LastName = "Moradi" }
+            );
+
             modelBuilder.Entity<Transaction>().HasData(
                 new Transaction { Id = 1, Type = TranactionType.Buy, DateTime = DateTime.Now.AddDays(-1), CustomerId = 1 },
                 new Transaction { Id = 2, Type = TranactionType.Buy, DateTime = DateTime.Now.AddDays(-2), CustomerId = 2 },

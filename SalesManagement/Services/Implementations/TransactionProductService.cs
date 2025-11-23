@@ -5,6 +5,7 @@ using SalesManagement.Models.ViewModels;
 using SalesManagement.Repositories.Interfaces;
 using SalesManagement.Services.Interfaces;
 using System.Threading.Tasks;
+using SalesManagement.Models.DTOs;
 
 namespace SalesManagement.Services.Implementations
 {

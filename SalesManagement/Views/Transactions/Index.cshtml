@@ -1,5 +1,5 @@
-﻿@using SalesManagement.Models.Entities
-@model IEnumerable<Transaction>
+﻿@using SalesManagement.Models.ViewModels
+@model TransactionIndexViewModel
 
 @{
     ViewData["Title"] = "Transactions";
@@ -17,22 +17,27 @@
 
     <!-- Filter Form -->
     <form asp-controller="Transactions" asp-action="Index" class="row g-3 mb-4 align-items-end">
-        <div class="col-md-3">
-            <label class="form-label fw-semibold">Transaction Type</label>
-            <select name="transactionType" class="form-select">
+        <div class="col-md-1">
+            <label class="form-label fw-semibold">Type</label>
+            <select name="transactionType" class="form-select" asp-items="Model.SelectListType">
                 <option value="">All</option>
-                <!-- Add dynamic types if available -->
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label fw-semibold">Customer</label>
+            <select name="transactionCustomer" class="form-select" asp-items="Model.SelectListCustomer">
+                <option value="">All</option>
             </select>
         </div>
         <div class="col-md-3">
             <label class="form-label fw-semibold">From</label>
-            <input type="date" name="fromDate" class="form-control" />
+            <input type="date" asp-for="fromDate" value="@Model.fromDate" class="form-control" />
         </div>
         <div class="col-md-3">
             <label class="form-label fw-semibold">To</label>
-            <input type="date" name="toDate" class="form-control" />
+            <input type="date" asp-for="toDate" value="@Model.toDate" class="form-control" />
         </div>
-        <div class="col-md-3 d-grid">
+        <div class="col-md-2 d-grid">
             <button type="submit" class="btn btn-outline-primary rounded-pill">
                 <i class="bi bi-funnel"></i> Filter
             </button>
@@ -44,6 +49,7 @@
         <table class="table table-striped table-hover align-middle mb-0">
             <thead class="table-dark text-white">
                 <tr>
+                    <th>Id</th>
                     <th>Type</th>
                     <th>Date</th>
                     <th>Customer</th>
@@ -51,9 +57,12 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var item in Model)
+                @foreach (var item in Model.Items)
                 {
                     <tr>
+                        <td>
+                            @item.Id
+                        </td>
                         <td>
                             @item.Type
                         </td>
@@ -61,7 +70,7 @@
                             @item.DateTime.ToString("yyyy-MM-dd HH:mm")
                         </td>
                         <td>
-                            @item.Customer.LastName
+                            @(item.Customer.FirstName + " " + item.Customer.LastName)
                         </td>
                         <td class="text-center">
                             <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary rounded-pill me-1">

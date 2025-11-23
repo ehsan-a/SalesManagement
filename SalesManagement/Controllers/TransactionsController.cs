@@ -32,9 +32,21 @@ namespace SalesManagement.Controllers
         }
 
         // GET: Transactions
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string transactionType, string transactionCustomer, string fromDate, string toDate)
         {
-            return View(await _service.GetAllAsync());
+            IEnumerable<Transaction> items = await _service.GetAllAsync();
+            items = _service.Filter(items, transactionType, transactionCustomer, fromDate, toDate);
+            var types = new[] { new { Id = 0, Title = "Buy" }, new { Id = 1, Title = "Sell" } };
+            var customers = (await _customerService.GetAllAsync()).Select(x => new { x.Id, Title = x.FirstName + " - " + x.LastName }).ToList();
+            var vm = new TransactionIndexViewModel
+            {
+                SelectListType = new SelectList(types, "Id", "Title", transactionType),
+                SelectListCustomer = new SelectList(customers, "Id", "Title", transactionCustomer),
+                Items = items.OrderByDescending(x => x.DateTime).ToList(),
+                fromDate = fromDate,
+                toDate = toDate
+            };
+            return View(vm);
         }
 
         // GET: Transactions/Details/5

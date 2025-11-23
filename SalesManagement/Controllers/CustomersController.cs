@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using SalesManagement.Data;
 using SalesManagement.Models.Entities;
+using SalesManagement.Services.Implementations;
 using SalesManagement.Services.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -13,17 +14,21 @@ namespace SalesManagement.Controllers
 {
     public class CustomersController : Controller
     {
-        private readonly IService<Customer> _service;
+        private readonly CustomerService _service;
 
         public CustomersController(IService<Customer> service)
         {
-            _service = service;
+            _service = (CustomerService)service;
         }
 
         // GET: Customers
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string searchFirstName, string searchLastName)
         {
-            return View(await _service.GetAllAsync());
+            IEnumerable<Customer> items = await _service.GetAllAsync();
+            items = _service.Filter(items, searchFirstName, searchLastName);
+            ViewBag.searchFirstName = searchFirstName;
+            ViewBag.searchLastName = searchLastName;
+            return View(items);
         }
 
         // GET: Customers/Details/5

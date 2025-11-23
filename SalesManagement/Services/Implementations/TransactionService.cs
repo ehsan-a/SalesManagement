@@ -2,6 +2,7 @@
 using SalesManagement.Data;
 using SalesManagement.Models.DTOs;
 using SalesManagement.Models.Entities;
+using SalesManagement.Models.ViewModels;
 using SalesManagement.Repositories.Interfaces;
 using SalesManagement.Services.Interfaces;
 using System.Threading.Tasks;
@@ -75,6 +76,29 @@ namespace SalesManagement.Services.Implementations
                      TranactionType = t.Type,
                      Quantity = tp.Quantity
                  }));
+        }
+
+        public IEnumerable<Transaction> Filter(IEnumerable<Transaction> items, string transactionType, string transactionCustomer, string fromDate, string toDate)
+        {
+            if (!string.IsNullOrEmpty(fromDate))
+            {
+                items = items.Where(x => Convert.ToDateTime(fromDate).DayOfYear <= x.DateTime.DayOfYear);
+            }
+
+            if (!string.IsNullOrEmpty(toDate))
+            {
+                items = items.Where(x => Convert.ToDateTime(toDate).DayOfYear >= x.DateTime.DayOfYear);
+            }
+
+            if (!string.IsNullOrEmpty(transactionType))
+            {
+                items = items.Where(x => (int)x.Type == int.Parse(transactionType));
+            }
+            if (!string.IsNullOrEmpty(transactionCustomer))
+            {
+                items = items.Where(x => x.CustomerId == int.Parse(transactionCustomer));
+            }
+            return items;
         }
 
     }

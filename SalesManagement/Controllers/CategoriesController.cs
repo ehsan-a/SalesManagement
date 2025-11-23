@@ -1,29 +1,34 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using SalesManagement.Data;
 using SalesManagement.Models.Entities;
+using SalesManagement.Models.ViewModels;
+using SalesManagement.Services.Implementations;
 using SalesManagement.Services.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace SalesManagement.Controllers
 {
     public class CategoriesController : Controller
     {
-        private readonly IService<Category> _service;
+        private readonly CategoryService _service;
 
         public CategoriesController(IService<Category> service)
         {
-            _service = service;
+            _service = (CategoryService)service;
         }
 
         // GET: Categories
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string searchString)
         {
-            return View(await _service.GetAllAsync());
+            IEnumerable<Category> items = await _service.GetAllAsync();
+            items = _service.Filter(items, searchString);
+            ViewBag.searchString = searchString;
+            return View(items);
         }
 
         // GET: Categories/Details/5

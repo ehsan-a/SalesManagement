@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using SalesManagement.Data;
 using SalesManagement.Models.Entities;
+using SalesManagement.Models.DTOs;
 using SalesManagement.Models.ViewModels;
 using SalesManagement.Services.Implementations;
 using SalesManagement.Services.Interfaces;

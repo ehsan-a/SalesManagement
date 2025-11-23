@@ -1,13 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
-using SalesManagement.Models.DTOs;
+using SalesManagement.Models.Entities;
+using System.Net.Sockets;
 
 namespace SalesManagement.Models.ViewModels
 {
-    public class ProductIndexViewModel
+    public class ProductTypeIndexViewModel
     {
-        public List<StockDto> Items { get; set; }
+        public List<ProductType> Items { get; set; }
         public string SearchString { get; set; }
-        public SelectList SelectListType { get; set; }
         public SelectList SelectListCategory { get; set; }
     }
 }

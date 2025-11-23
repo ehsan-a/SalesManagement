@@ -3,29 +3,41 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using SalesManagement.Data;
 using SalesManagement.Models.Entities;
+using SalesManagement.Models.ViewModels;
+using SalesManagement.Services.Implementations;
 using SalesManagement.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Sockets;
 using System.Threading.Tasks;
 
 namespace SalesManagement.Controllers
 {
     public class ProductTypesController : Controller
     {
-        private readonly IService<ProductType> _service;
+        private readonly ProductTypeService _service;
         private readonly IService<Category> _categoryService;
 
         public ProductTypesController(IService<ProductType> service, IService<Category> categoryService)
         {
-            _service = service;
+            _service = (ProductTypeService)service;
             _categoryService = categoryService;
         }
 
         // GET: ProductTypes
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string searchString, string productTypeCategory)
         {
-            return View(await _service.GetAllAsync());
+            IEnumerable<ProductType> items = await _service.GetAllAsync();
+            items = _service.Filter(items, searchString, productTypeCategory);
+            IEnumerable<Category> categories = await _categoryService.GetAllAsync();
+            var vm = new ProductTypeIndexViewModel
+            {
+                SelectListCategory = new SelectList(categories, "Id", "Title", productTypeCategory),
+                Items = items.ToList(),
+                SearchString = searchString,
+            };
+            return View(vm);
         }
 
         // GET: ProductTypes/Details/5

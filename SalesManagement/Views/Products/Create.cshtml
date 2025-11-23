@@ -45,17 +45,17 @@
                     </select>
                 </div>
 
-                <!-- Is Active -->
-                <div class="form-check mb-3">
-                    <input class="form-check-input" asp-for="IsActive" />
-                    <label class="form-check-label fw-semibold">@Html.DisplayNameFor(model => model.IsActive)</label>
-                </div>
-
                 <!-- Minimum Quantity -->
                 <div class="mb-3">
                     <label asp-for="MinQuantity" class="form-label fw-semibold"></label>
                     <input asp-for="MinQuantity" class="form-control" placeholder="Enter minimum quantity" />
                     <span asp-validation-for="MinQuantity" class="text-danger"></span>
+                </div>
+
+                <!-- Is Active -->
+                <div class="form-check mb-3">
+                    <input class="form-check-input" asp-for="IsActive" />
+                    <label class="form-check-label fw-semibold">@Html.DisplayNameFor(model => model.IsActive)</label>
                 </div>
 
                 <!-- Form Actions -->

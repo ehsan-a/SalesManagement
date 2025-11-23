@@ -1,28 +1,34 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using SalesManagement.Data;
 using SalesManagement.Models.Entities;
+using SalesManagement.Services.Implementations;
+using SalesManagement.Services.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace SalesManagement.Controllers
 {
     public class UsersController : Controller
     {
-        private readonly SalesManagementContext _context;
+        private readonly UserService _service;
 
-        public UsersController(SalesManagementContext context)
+        public UsersController(IService<User> service)
         {
-            _context = context;
+            _service = (UserService)service;
         }
 
         // GET: Users
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string searchFirstName, string searchLastName)
         {
-            return View(await _context.User.ToListAsync());
+            IEnumerable<User> items = await _service.GetAllAsync();
+            items = _service.Filter(items, searchFirstName, searchLastName);
+            ViewBag.searchFirstName = searchFirstName;
+            ViewBag.searchLastName = searchLastName;
+            return View(items);
         }
 
         // GET: Users/Details/5
@@ -33,8 +39,7 @@ namespace SalesManagement.Controllers
                 return NotFound();
             }
 
-            var user = await _context.User
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var user = await _service.GetByIdAsync(id.Value);
             if (user == null)
             {
                 return NotFound();
@@ -58,8 +63,7 @@ namespace SalesManagement.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(user);
-                await _context.SaveChangesAsync();
+                await _service.CreateAsync(user);
                 return RedirectToAction(nameof(Index));
             }
             return View(user);
@@ -73,7 +77,7 @@ namespace SalesManagement.Controllers
                 return NotFound();
             }
 
-            var user = await _context.User.FindAsync(id);
+            var user = await _service.GetByIdAsync(id.Value);
             if (user == null)
             {
                 return NotFound();
@@ -97,12 +101,11 @@ namespace SalesManagement.Controllers
             {
                 try
                 {
-                    _context.Update(user);
-                    await _context.SaveChangesAsync();
+                    await _service.UpdateAsync(user);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!UserExists(user.Id))
+                    if (await UserExists(user.Id) == false)
                     {
                         return NotFound();
                     }
@@ -124,8 +127,7 @@ namespace SalesManagement.Controllers
                 return NotFound();
             }
 
-            var user = await _context.User
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var user = await _service.GetByIdAsync(id.Value);
             if (user == null)
             {
                 return NotFound();
@@ -139,19 +141,13 @@ namespace SalesManagement.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var user = await _context.User.FindAsync(id);
-            if (user != null)
-            {
-                _context.User.Remove(user);
-            }
-
-            await _context.SaveChangesAsync();
+            await _service.DeleteAsync(id);
             return RedirectToAction(nameof(Index));
         }
 
-        private bool UserExists(int id)
+        private async Task<bool> UserExists(int id)
         {
-            return _context.User.Any(e => e.Id == id);
+            return await _service.ExistsAsync(id);
         }
     }
 }

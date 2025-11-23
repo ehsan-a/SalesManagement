@@ -21,8 +21,10 @@
     </div>
 
     <!-- Product Info Card -->
-    <div class="card shadow-sm rounded-4 mx-auto mb-4" style="max-width: 700px;">
+    <div class="card shadow-sm rounded-4 mb-4">
         <div class="card-body p-4 p-md-5">
+            <h4 class="fw-semibold mb-3">Product Information</h4>
+            <hr />
             <dl class="row mb-0">
                 <dt class="col-sm-4 fw-semibold">Title</dt>
                 <dd class="col-sm-8">@Html.DisplayFor(model => model.Title)</dd>
@@ -51,14 +53,13 @@
         </div>
     </div>
 
-    <!-- Cardex / Transaction Products Table -->
-    <div class="card shadow-sm rounded-4 mx-auto" style="max-width: 900px;">
+    <!-- Cardex / Transaction Products Table Card -->
+    <div class="card shadow-sm rounded-4">
         <div class="card-body p-4 p-md-5">
             <h4 class="fw-semibold mb-3">Cardex / Transaction Products</h4>
             <hr />
-
             <div class="table-responsive">
-                <table class="table table-hover table-bordered align-middle rounded-3 mb-0">
+                <table class="table table-bordered table-hover align-middle mb-0">
                     <thead class="table-light">
                         <tr>
                             <th>Transaction ID</th>
@@ -75,9 +76,11 @@
                                 <td>@item.Quantity</td>
                                 <td>@item.UnitPrice.ToString("0.00")</td>
                                 <td class="text-center">
-                                    <a asp-controller="TransactionProducts" asp-action="Details" asp-route-id="@item.Id"
+                                    <a asp-controller="TransactionProducts"
+                                       asp-action="Details"
+                                       asp-route-id="@item.Id"
                                        class="btn btn-sm btn-outline-primary rounded-pill">
-                                        <i class="bi bi-eye"></i> Details
+                                        <i class="bi bi-info-circle"></i> Details
                                     </a>
                                 </td>
                             </tr>
@@ -85,13 +88,14 @@
                         @if (!Model.TransactionProducts.Any())
                         {
                             <tr>
-                                <td colspan="4" class="text-center text-muted">No transaction records found.</td>
+                                <td colspan="4" class="text-center text-muted py-3">
+                                    No transaction records found.
+                                </td>
                             </tr>
                         }
                     </tbody>
                 </table>
             </div>
-
         </div>
     </div>
 

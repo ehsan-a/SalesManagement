@@ -5,6 +5,7 @@ using SalesManagement.Models.ViewModels;
 using SalesManagement.Repositories.Interfaces;
 using SalesManagement.Services.Interfaces;
 using System.Threading.Tasks;
+using SalesManagement.Models.DTOs;
 
 namespace SalesManagement.Services.Implementations
 {
@@ -44,7 +45,7 @@ namespace SalesManagement.Services.Implementations
         public async Task<bool> ExistsAsync(int id) => await _repository.ExistsAsync(id);
         public async Task<IEnumerable<StockDto>> GetItemsAsync()
         {
-            var products = await _repository.GetAllAsync();
+            var products = await GetAllAsync();
 
             return products.Select(p => new StockDto
             {
